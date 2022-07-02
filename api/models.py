@@ -14,7 +14,7 @@ class Meeting (models.Model):
     date = models.DateField(null=True)
     start_time = models.TimeField(null=True)
     end_time = models.TimeField(null=True)
-    room_id = models.ForeignKey('Room', on_delete=models.SET_NULL, null=True)
+    room = models.ForeignKey('Room', on_delete=models.SET_NULL, null=True)
     is_repeated = models.BooleanField(null=True)
     verify_id = models.IntegerField(null=True)
     email = models.EmailField(null=True)
