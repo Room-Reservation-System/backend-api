@@ -172,3 +172,10 @@ cython_debug/
 #.idea/
 
 # End of https://www.toptal.com/developers/gitignore/api/django
+
+
+# user_settings:
+
+config/token.py
+api/my_excel.py
+api/myMail.py
