@@ -176,6 +176,5 @@ cython_debug/
 
 # user_settings:
 
-config/token.py
-api/my_excel.py
+config/hiden.py
 api/myMail.py

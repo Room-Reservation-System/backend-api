@@ -57,7 +57,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'email_templates'), BASE_DIR],
+        'DIRS': [os.path.join(BASE_DIR, 'email_templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -126,12 +126,13 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'\
 
 
-# email settings 
+# email settings:
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.mail.ru'
 EMAIL_HOST_USER = "eku.160500@mail.ru"
 EMAIL_HOST_PASSWORD = "qjZDtn7IHKDnH5G9Q4MC"
+# EMAIL_HOST_USER = hiden.ROOT_ACCAUNT
+# EMAIL_HOST_PASSWORD = hiden.ROOT_PASSWORD
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-# my_django4
