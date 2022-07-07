@@ -178,3 +178,4 @@ cython_debug/
 
 config/hiden.py
 api/myMail.py
+**.xlsx
