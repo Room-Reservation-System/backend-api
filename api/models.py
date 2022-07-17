@@ -2,6 +2,7 @@ from django.db import models
 
 
 class Room (models.Model):
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=150)
     information = models.CharField(max_length=250)
 
@@ -30,7 +31,7 @@ class Meeting (models.Model):
         choices=MEETING_STATUS,
         blank = True,
         default = 'p',
-        help_text='Book availability')
+        help_text='Meeting status')
 
     def __str__(self):
         return self.name
