@@ -5,7 +5,7 @@ class RoomAdmin(admin.ModelAdmin):
     list_display = ['name','seats','information','id']
 
 class MeetingAdmin(admin.ModelAdmin):
-    list_display = ['name','description','room','type','status','date','start_time','end_time','email','created_at']
+    list_display = ['title','description','room','type','status','date','start_time','end_time','email','created_at']
     list_filter = ( 'room','type','date','status')
 
 admin.site.register(Room,RoomAdmin)

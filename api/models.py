@@ -15,7 +15,7 @@ class Room (models.Model):
         ordering = ['id']
 
 class Meeting (models.Model):
-    name = models.CharField(max_length=100)
+    title = models.CharField(max_length=100)
     description = models.CharField(max_length=250)
     date = models.DateField(null=True)
     created_at = models.DateTimeField(auto_now=True)
@@ -42,6 +42,6 @@ class Meeting (models.Model):
         return super().clean()
 
     def __str__(self):
-        return self.name
+        return self.title
     class Meta:
         ordering = ['date', 'start_time']
