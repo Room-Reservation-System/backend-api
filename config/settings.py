@@ -127,7 +127,6 @@ STATIC_URL = '/static/'
 STATIC_ROOT = "/home/ilkhom19/backend-api/static"
 # or, eg,
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
@@ -139,5 +138,3 @@ CORS_ALLOW_ALL_ORIGINS = True
 # 'http://localhost:3000',
 # 'http://localhost:8000',
 # )
-
-
