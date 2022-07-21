@@ -22,7 +22,7 @@ def meeting_list(request, id):
             return Response(serializer.data)
 
         try:    
-            meetings =  Meeting.objects.filter(room_id__id = id, date__range=[start_date, end_date])
+            meetings =  Meeting.objects.filter(room__id = id, date__range=[start_date, end_date])
         except Meeting.DoesNotExist:
             return Response(status = status.HTTP_404_NOT_FOUND)
 

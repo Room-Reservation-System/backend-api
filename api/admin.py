@@ -2,11 +2,11 @@ from django.contrib import admin
 from .models import Meeting, Room
 
 class RoomAdmin(admin.ModelAdmin):
-    list_display = ['name','information','id']
+    list_display = ['name','seats','information','id']
 
 class MeetingAdmin(admin.ModelAdmin):
-    list_display = ['name','description','room','date','start_time','end_time','is_repeated','email','status','created_at']
-    list_filter = ( 'room','is_repeated','date','status')
+    list_display = ['name','description','room','type','status','date','start_time','end_time','email','created_at']
+    list_filter = ( 'room','type','date','status')
 
 admin.site.register(Room,RoomAdmin)
 admin.site.register(Meeting, MeetingAdmin)

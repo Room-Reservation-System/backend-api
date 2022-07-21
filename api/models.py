@@ -1,13 +1,18 @@
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.exceptions import ValidationError
 
 
 class Room (models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=150)
+    seats = models.IntegerField(default = 0,validators=[MaxValueValidator(250), MinValueValidator(1)])
     information = models.CharField(max_length=250)
 
     def __str__(self):
         return self.name
+    class Meta:
+        ordering = ['id']
 
 class Meeting (models.Model):
     name = models.CharField(max_length=100)
@@ -17,23 +22,26 @@ class Meeting (models.Model):
     start_time = models.TimeField(null=True)
     end_time = models.TimeField(null=True)
     room = models.ForeignKey('Room', on_delete=models.SET_NULL, null=True)
-    is_repeated = models.BooleanField(default=False)
-    verify_id = models.IntegerField(null=True)
+    type = models.CharField(max_length=5,choices=(('class','Class'),('event','Event')), blank=False, default='event')
     email = models.EmailField(null=True)
 
     MEETING_STATUS = (
-        ('p', 'Pending'),
-        ('d', 'Declined'),
-        ('a', 'Accepted'),
+        ('pending', 'Pending'),
+        ('declined', 'Declined'),
+        ('accepted', 'Accepted'),
     )
     status = models.CharField(
-        max_length=1,
+        max_length=8,
         choices=MEETING_STATUS,
-        blank = True,
-        default = 'p',
+        default = 'pending',
         help_text='Meeting status')
+
+    def clean(self):
+        if self.start_time > self.end_time:
+            raise ValidationError('Start time should be before the end time')
+        return super().clean()
 
     def __str__(self):
         return self.name
     class Meta:
-        ordering = ['date']
+        ordering = ['date', 'start_time']
