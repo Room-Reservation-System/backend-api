@@ -83,22 +83,21 @@ def sendMail(request):
         targetMail=TargetMail(data=request.data)
 
         if targetMail.is_valid():
-            qwe=targetMail.data['email']
-            password=f'{randint(1000,9999)}'
+            userMail=targetMail.data['email']
+            PINcode=f'{randint(1000,9999)}'
             
-            html_temp = render_to_string('check_mail.html', {'PIN_code': password})
+            html_temp = render_to_string('check_mail.html', {'PIN_code': PINcode})
             
             email = EmailMessage(
                 "Checking django!",
                 html_temp,
                 settings.EMAIL_HOST_USER,
-                [qwe]
+                [userMail]
                 )
-            print(qwe)
 
             email.fail_silently = False
             email.send()
-            return Response(password, status=status.HTTP_201_CREATED)
+            return Response(f'{PINcode=}, {userMail=}', status=status.HTTP_201_CREATED)
         else: return Response(targetMail.errors)
 
 
