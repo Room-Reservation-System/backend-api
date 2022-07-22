@@ -10,3 +10,6 @@ class RoomSerializer (serializers.ModelSerializer):
     class Meta:
         model = Room
         fields = ['id','name','seats','information']
+
+class TargetMail(serializers.Serializer):
+    email=serializers.CharField(max_length=300)

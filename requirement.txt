@@ -5,4 +5,10 @@ djangorestframework==3.13.1
 pytz==2022.1
 sqlparse==0.4.2
 django-cors-headers==3.13.0
-django-cors-headers==3.13.0
+cffi==1.15.0
+et-xmlfile==1.1.0
+greenlet==0.4.13
+hpy==0.0.3
+openpyxl==3.0.10
+readline==6.2.4.1
+tzdata==2022.1

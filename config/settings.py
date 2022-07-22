@@ -61,7 +61,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'email_templates'), os.path.join(BASE_DIR, 'config')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -137,3 +137,10 @@ CORS_ALLOW_ALL_ORIGINS = True
 # 'http://localhost:3000',
 # 'http://localhost:8000',
 # )
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_HOST_USER = "eku.160500@mail.ru"
+EMAIL_HOST_PASSWORD = "qjZDtn7IHKDnH5G9Q4MC"
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
