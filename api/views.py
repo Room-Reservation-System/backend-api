@@ -85,7 +85,7 @@ def sendMail(request):
             from_email='ilkhomzhon.sidikov@gmail.com',
             to_emails=address,
             subject='Email Verification for RRS',
-            html_content='<Your Secret code is: {password}</strong>')
+            html_content=f'Your Secret code is: {password}')
         try:
             sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
             response = sg.send(message)
