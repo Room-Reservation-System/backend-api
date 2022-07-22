@@ -9,6 +9,9 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from random import randint
 from django.db.models import Q
+import os
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 @api_view(['GET', 'POST'])
 def meeting_list(request, id):
@@ -73,22 +76,20 @@ def room_list(request):
 
 @api_view(['POST'])
 def sendMail(request):
-
     targetMail=TargetMail(data=request.data)
 
     if targetMail.is_valid():
         address=targetMail.data['email']
         password=f'{randint(1000,9999)}'
-        html_temp = render_to_string('check_mail.html', {'PIN_code': password})
-        
-        email = EmailMessage(
-            "Verify your Email",
-            html_temp,
-            settings.EMAIL_HOST_USER,
-            [address]
-            )
-
-        email.fail_silently = False
-        email.send()
-        return Response(password, status=status.HTTP_200_OK)
+        message = Mail(
+            from_email='ilkhomzhon.sidikov@gmail.com',
+            to_emails=address,
+            subject='Email Verification for RRS',
+            html_content='<Your Secret code is: {password}</strong>')
+        try:
+            sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+            response = sg.send(message)
+        except Exception as e:
+            return Response("Couldn't send email!", status=status.HTTP_408_REQUEST_TIMEOUT)
+        return Response([address,password], status=status.HTTP_200_OK)
     else: return Response(targetMail.errors)
