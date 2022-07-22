@@ -12,3 +12,6 @@ hpy==0.0.3
 openpyxl==3.0.10
 readline==6.2.4.1
 tzdata==2022.1
+python-http-client==3.3.7
+sendgrid==6.9.7
+starkbank-ecdsa==2.0.3
