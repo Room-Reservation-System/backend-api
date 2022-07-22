@@ -1,6 +1,6 @@
 from datetime import date, timedelta
 from rest_framework.response import Response
-from .serializers import MeetingSerializer, RoomSerializer
+from .serializers import MeetingSerializer, RoomSerializer, TargetMail
 from .models import Meeting, Room
 from rest_framework.decorators import api_view
 from rest_framework import status
@@ -11,6 +11,7 @@ from django.core.mail import send_mail, BadHeaderError, EmailMessage
 from django.contrib import messages
 from django.template.loader import render_to_string
 from django.conf import settings
+from random import randint
 
 
 
@@ -75,18 +76,30 @@ def room_list(request):
     serializer = RoomSerializer(rooms, many = True)
     return Response(serializer.data)
 
-
+@api_view(['POST'])
 def sendMail(request):
-    
-    html_temp = render_to_string('check_mail.html', {'name': 'eku'})
-    
-    email = EmailMessage(
-		"Checking django!",
-		html_temp,
-		settings.EMAIL_HOST_USER,
-		['eku.ulanov@yandex.com', 'eku.ulanov@gmail.com']
-        )
 
-    email.fail_silently = False
-    email.send()
-    return render(request, 'check_mail.html', {'name': 'eku'})
+    if request.method=='POST':
+        targetMail=TargetMail(data=request.data)
+
+        if targetMail.is_valid():
+            qwe=targetMail.data['email']
+            password=f'{randint(1000,9999)}'
+            
+            html_temp = render_to_string('check_mail.html', {'PIN_code': password})
+            
+            email = EmailMessage(
+                "Checking django!",
+                html_temp,
+                settings.EMAIL_HOST_USER,
+                [qwe]
+                )
+            print(qwe)
+
+            email.fail_silently = False
+            email.send()
+            return Response(password, status=status.HTTP_201_CREATED)
+        else: return Response(targetMail.errors)
+
+
+# {"email": "eku.ulanov@gmail.com"}

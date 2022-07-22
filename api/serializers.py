@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Meeting, Room
+from .models import Meeting, Room, TargetMailUser
 
 class MeetingSerializer (serializers.ModelSerializer):
     class Meta:
@@ -10,3 +10,10 @@ class RoomSerializer (serializers.ModelSerializer):
     class Meta:
         model = Room
         fields = ['id','name','information']
+
+class TargetMail(serializers.Serializer):
+    # class Meta:
+    #     model=TargetMailUser
+    # fields 
+    email=serializers.CharField(max_length=300)
+     
