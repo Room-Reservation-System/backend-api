@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-ana^0nv(j($-#z!t5w*+35qy*x45pu2s0zc2v=a(k&@h+z2i7n
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [] 
+ALLOWED_HOSTS = ['ilkhom19.pythonanywhere.com', '127.0.0.1']
 
 
 # Application definition
@@ -112,7 +112,6 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Asia/Bishkek'
-
 USE_I18N = True
 
 USE_TZ = True
@@ -123,6 +122,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+#STATIC_ROOT = "/home/ilkhom19/backend-api/static"
+# or, eg,
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field

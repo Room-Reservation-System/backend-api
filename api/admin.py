@@ -1,20 +1,12 @@
 from django.contrib import admin
 from .models import Meeting, Room
 
-# Register your models here.
-
-#admin.site.register(Meeting)
-#admin.site.register(Room)
-
 class RoomAdmin(admin.ModelAdmin):
-    list_display = ['name','information','id']
-    pass
+    list_display = ['name','seats','information','id']
 
 class MeetingAdmin(admin.ModelAdmin):
-    list_display = ['name','description','room','date','start_time','end_time','is_repeated','email','status','created_at']
-    list_filter = ( 'room','date','status')
-    
-    pass
+    list_display = ['title','description','room','type','status','date','start_time','end_time','email','created_at']
+    list_filter = ( 'room','type','date','status')
 
 admin.site.register(Room,RoomAdmin)
 admin.site.register(Meeting, MeetingAdmin)

@@ -8,3 +8,4 @@ urlpatterns = [
     path('mail/', views.sendMail),              # GET rooms
     path('qwe/<int:id>', views.xlsxCheck),
 ]
+

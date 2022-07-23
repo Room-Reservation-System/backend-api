@@ -4,16 +4,14 @@ from .serializers import MeetingSerializer, RoomSerializer, TargetMail
 from .models import Meeting, Room
 from rest_framework.decorators import api_view
 from rest_framework import status
-from .tableGenerator import TableGenerator
-
-from django.shortcuts import render
-from django.http import HttpResponse
 from django.core.mail import send_mail, BadHeaderError, EmailMessage
-from django.contrib import messages
 from django.template.loader import render_to_string
 from django.conf import settings
 from random import randint
-
+from django.db.models import Q
+import os
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 @api_view(['GET'])
 def xlsxCheck(request, id):
@@ -57,7 +55,7 @@ def meeting_list(request, id):
             return Response(serializer.data)
 
         try:    
-            meetings =  Meeting.objects.filter(room_id__id = id, date__range=[start_date, end_date])
+            meetings =  Meeting.objects.filter(Q(room__id = id) & (Q(date__range=[start_date, end_date]) | Q(type__exact = ('class'))))
         except Meeting.DoesNotExist:
             return Response(status = status.HTTP_404_NOT_FOUND)
 
@@ -106,33 +104,20 @@ def room_list(request):
 
 @api_view(['POST'])
 def sendMail(request):
-    if request.method=='POST':
-        targetMail=TargetMail(data=request.data)
-        if targetMail.is_valid():
-            userMail=targetMail.data['email']
-            PINcode=f'{randint(1000,9999)}'
-            html_temp = render_to_string('check_mail.html', {'PIN_code': PINcode})
-            try:
-                send_mail(
-                    'Noreply! PIN code',
-                    html_temp,
-                    'noreply@sopsonun.com',
-                    [userMail],
-                    )         
-            except BadHeaderError:
-                return HttpResponse('error')   
-            return Response(f'{PINcode=}, {userMail=}', status=status.HTTP_201_CREATED)
-        else: return Response(targetMail.errors)
+    targetMail=TargetMail(data=request.data)
 
-
-# {"email": "eku.ulanov@gmail.com"}
-
-            # email = EmailMessage(
-            #     "Checking django!",
-            #     html_temp,
-            #     settings.EMAIL_HOST_USER,
-            #     [userMail]
-            #     )
-
-            # email.fail_silently = False
-            # email.send()
+    if targetMail.is_valid():
+        address=targetMail.data['email']
+        password=f'{randint(1000,9999)}'
+        message = Mail(
+            from_email='ilkhomzhon.sidikov@gmail.com',
+            to_emails=address,
+            subject='Email Verification for RRS',
+            html_content=f'Your Secret code is: {password}')
+        try:
+            sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+            response = sg.send(message)
+        except Exception as e:
+            return Response("Couldn't send email!", status=status.HTTP_408_REQUEST_TIMEOUT)
+        return Response([address,password], status=status.HTTP_200_OK)
+    else: return Response(targetMail.errors)

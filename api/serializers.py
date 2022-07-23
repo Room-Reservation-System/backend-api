@@ -4,16 +4,12 @@ from .models import Meeting, Room, TargetMailUser
 class MeetingSerializer (serializers.ModelSerializer):
     class Meta:
         model = Meeting
-        fields = ['id','name','description','date','start_time','end_time','room','is_repeated','verify_id','email','status']
+        fields = ['id','title','description','date','start_time','end_time','room','type','email','status']
 
 class RoomSerializer (serializers.ModelSerializer):
     class Meta:
         model = Room
-        fields = ['id','name','information']
+        fields = ['id','name','seats','information']
 
 class TargetMail(serializers.Serializer):
-    # class Meta:
-    #     model=TargetMailUser
-    # fields 
     email=serializers.CharField(max_length=300)
-     
