@@ -4,6 +4,7 @@ from .serializers import MeetingSerializer, RoomSerializer, TargetMail
 from .models import Meeting, Room
 from rest_framework.decorators import api_view
 from rest_framework import status
+from .tableGenerator import TableGenerator
 
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -14,7 +15,32 @@ from django.conf import settings
 from random import randint
 
 
+@api_view(['GET'])
+def xlsxCheck(request, id):
+    
+    if request.method=='GET':
 
+        current_date = date.today()
+        end_date = current_date + timedelta(days=60)
+        start_date = current_date - timedelta(days=30)
+
+        if id == 0:
+
+            meetings = Meeting.objects.all()
+            serializer = MeetingSerializer(meetings, many = True)
+            return Response(serializer.data)
+
+        try:    
+            meetings =  Meeting.objects.filter(room_id__id = id, date__range=[start_date, end_date])
+        except Meeting.DoesNotExist:
+            return Response(status = status.HTTP_404_NOT_FOUND)
+
+        serializer = MeetingSerializer(meetings, many = True)
+        template=TableGenerator(data=serializer.data)
+        template.setData()
+        return Response(serializer.data)
+        
+        
 @api_view(['GET', 'POST'])
 def meeting_list(request, id):
 
@@ -70,6 +96,8 @@ def meeting_detail(request, id):
 
 
 
+
+
 @api_view(['GET'])
 def room_list(request):
     rooms = Room.objects.all()
@@ -78,27 +106,33 @@ def room_list(request):
 
 @api_view(['POST'])
 def sendMail(request):
-
     if request.method=='POST':
         targetMail=TargetMail(data=request.data)
-
         if targetMail.is_valid():
             userMail=targetMail.data['email']
             PINcode=f'{randint(1000,9999)}'
-            
             html_temp = render_to_string('check_mail.html', {'PIN_code': PINcode})
-            
-            email = EmailMessage(
-                "Checking django!",
-                html_temp,
-                settings.EMAIL_HOST_USER,
-                [userMail]
-                )
-
-            email.fail_silently = False
-            email.send()
+            try:
+                send_mail(
+                    'Noreply! PIN code',
+                    html_temp,
+                    'noreply@sopsonun.com',
+                    [userMail],
+                    )         
+            except BadHeaderError:
+                return HttpResponse('error')   
             return Response(f'{PINcode=}, {userMail=}', status=status.HTTP_201_CREATED)
         else: return Response(targetMail.errors)
 
 
 # {"email": "eku.ulanov@gmail.com"}
+
+            # email = EmailMessage(
+            #     "Checking django!",
+            #     html_temp,
+            #     settings.EMAIL_HOST_USER,
+            #     [userMail]
+            #     )
+
+            # email.fail_silently = False
+            # email.send()

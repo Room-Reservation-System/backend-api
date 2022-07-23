@@ -131,15 +131,22 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'\
 
 
 # email settings:
+EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
+SENDGRID_API_KEY = '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'
+SENDGRID_SANDBOX_MODE_IN_DEBUG=False
+# EMAIL_HOST = 'smtp.mail.ru'
+# EMAIL_HOST_USER = "eku.160500@mail.ru
+# EMAIL_HOST_PASSWORD = "qjZDtn7IHKDnH5G9Q4MC"
+# SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+# EMAIL_HOST='smtp.sendgrid.net'
+# EMAIL_HOST_USER='apikey'
+# EMAIL_HOST_PASSWORD='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'
+# EMAIL_USE_TLS = True
+# EMAIL_PORT = 587
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.mail.ru'
-EMAIL_HOST_USER = "eku.160500@mail.ru"
-EMAIL_HOST_PASSWORD = "qjZDtn7IHKDnH5G9Q4MC"
-# EMAIL_HOST_USER = hiden.ROOT_ACCAUNT
-# EMAIL_HOST_PASSWORD = hiden.ROOT_PASSWORD
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
+
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = True
