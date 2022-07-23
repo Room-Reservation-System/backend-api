@@ -4,9 +4,6 @@ from .serializers import MeetingSerializer, RoomSerializer, TargetMail
 from .models import Meeting, Room
 from rest_framework.decorators import api_view
 from rest_framework import status
-from django.core.mail import send_mail, BadHeaderError, EmailMessage
-from django.template.loader import render_to_string
-from django.conf import settings
 from random import randint
 from django.db.models import Q
 import os
@@ -19,8 +16,8 @@ def meeting_list(request, id):
     if request.method == 'GET':
 
         current_date = date.today()
-        end_date = current_date + timedelta(days=60)
-        start_date = current_date - timedelta(days=30)
+        end_date = current_date + timedelta(days=90)
+        start_date = current_date - timedelta(days=60)
 
         if id == 0:
 
@@ -29,7 +26,7 @@ def meeting_list(request, id):
             return Response(serializer.data)
 
         try:    
-            meetings =  Meeting.objects.filter(Q(room__id = id) & (Q(date__range=[start_date, end_date]) | Q(type__exact = ('class'))))
+            meetings =  Meeting.objects.filter(Q(room__id = id,status__exact = ('accepted')) & (Q(date__range=[start_date, end_date]) | Q(type__exact = ('class'))))
         except Meeting.DoesNotExist:
             return Response(status = status.HTTP_404_NOT_FOUND)
 
