@@ -10,7 +10,7 @@ import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
-from .tableGenerator import TableGenerator
+from .xlsxGenerator.tableGenerator import TableGenerator
 
 @api_view(['GET'])
 def xlsxCheck(request, id):
