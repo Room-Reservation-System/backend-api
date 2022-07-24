@@ -3,6 +3,7 @@ from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font
 from openpyxl import Workbook
 from datetime import datetime
+from .filter import Filter
 
 
 class Base:
@@ -70,80 +71,63 @@ class Base:
     sheet=wb.active
 
 class TableGenerator(Base):
-    def __init__(self,
-                 data:list,
-                 timing:dict={'startTime':
-                                        {'hours':8, 
-                                         'minutes':00},
-                              'endTime':
-                                        {'hours':24,
-                                         'minutes':00}},
-                 ):
+    def __init__(self,data:list,title:str,timing:dict={'startTime': {'hours':8, 'minutes':00},'endTime':{'hours':24,'minutes':00}},):
 
-        self.class_id=f"Schedule of class #{1}"
+        self.data=Filter().filter(data)
+        self.title=f"Time table of {title}"
         self.timing=timing
-        self.data=data
 
         self.week_list=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
         self.columns=['A','B','C','D','E','F','G','H']
 
-    # def filter(self, data:dict=None, targets:list=['name','description','start_time','end_time','room','day'])->dict:
-    #     return dict((key,value) for key, value in data.items() if key in targets)
-
     def setData(self,):
-        color_fill=['FFCCCC','FFE5CC','FFFFCC','E5FFCC','CCFFCC','CCFFE5','CCFFFF','CCE5FF','CCCCFF','E5CCFF','FFCCFF','FFCCE5',
+        color_fill=[ #'FFCCCC','FFE5CC','FFFFCC','E5FFCC','CCFFCC','CCFFE5','CCFFFF','CCE5FF','CCCCFF','E5CCFF','FFCCFF','FFCCE5',
                     'FF9999','FFCC99','FFFF99','CCFF99','99FF99','99FFCC','99FFFF','99CCFF','9999FF','CC99FF','FF99FF','FF99CC'
         ]
 
         self.__getTemplate()
-        for key in self.data:  
-            # for key,val in data_class.items():
 
-            print(key)
-        #     used=[]
-        #     row_A:int=0
-        #     row_B:int=0        
-        #     column_A:str=''
-        #     column_B:str=''
-        #     name=key['name']
-        #     description=key['description']
-        #     start_time=key['start_time']
-        #     end_time=key['end_time']
-        #     color=choice(color_fill)
-    
-        #     for i, row in enumerate(Base.sheet['A']):
-        #         if row.value==key['start_time'][:-3]:
-        #             row_A=i
-        #             # print(row_A)
-        #         if row.value==key['end_time'][:-3]:
-        #             row_B=i
-        #             print(row_B)
-        #     for i, column in enumerate(Base.sheet[3]):
-        #         d=key['date'].split('-')
-        #         d=datetime(int(d[0]),int(d[1]),int(d[-1]))
-        #         d=d.strftime('%A')
-        #         if column.value==d:
-        #             column_A=i
-        #             # print(125,column_A)
-        #     cellDesc:str=f'{name}\n\n{start_time}-{end_time}'
-        #     print(f'{self.columns[column_A]}{row_A+1}:{self.columns[column_A]}{row_B}')
-        #     colorCell(column=self.columns[column_A],row=row_A+1, color=color)
-        #     Base.sheet.merge_cells(f'{self.columns[column_A]}{row_A+1}:{self.columns[column_A]}{row_B}')
-        #     templateDescription(column=self.columns[column_A],row=row_A+1,value=cellDesc,size=14)
-                    
-        # Base.wb.save(filename='test.xlsx')
+        subjectColor:dict={}
+       
+        for val in self.data:
+            
+            row_A:int=0
+            row_B:int=0        
+            column_A:int=''
+            name=val['title'].upper()
+            start_time=val['start_time']
+            end_time=val['end_time']
+            if name not in subjectColor:
+                subjectColor[name]=choice(color_fill)
+                print(102)
+            
+            for i, row in enumerate(Base.sheet['A']):
+                if row.value==val['start_time']:
+                    row_A=i
+                if row.value==val['end_time']:
+                    row_B=i
+            for i, column in enumerate(Base.sheet[3]):
+                if column.value==val['day']:
+                    column_A=i
+            cellDesc:str=f'{name}\n\n{start_time}-{end_time}'
+            colorCell(column=self.columns[column_A],row=row_A+1, color=subjectColor[name])
+            Base.sheet.merge_cells(f'{self.columns[column_A]}{row_A+1}:{self.columns[column_A]}{row_B}')
+            templateDescription(column=self.columns[column_A],row=row_A+1,value=cellDesc,size=14)
+
+        for key, val in subjectColor.items():
+            print(f'{key}: {val}')
+        Base.wb.save(filename='test.xlsx')
 
     def __getTemplate(self):
         Base.sheet.merge_cells('B1:H1')
         Base.sheet['B1'].fill=fill_main
         Base.sheet['A1'].fill=fill_main
-        templateText(column='B', row=1, size=20, value='Template')
+        templateText(column='B', row=1, size=20, value=self.title)
         for i, cell in enumerate(self.columns):
-            Base.sheet[f'{cell}{3}'].border=border_medium
             Base.sheet.merge_cells(f'{self.columns[i]}3:{self.columns[i]}4')
             Base.sheet[f'{self.columns[i]}3'].fill=fill_main
             if cell=='A':
-                Base.sheet.column_dimensions['A'].width=20
+                Base.sheet.column_dimensions['A'].width=15
                 templateText(column='A',row=3,value='Duration')
             else:
                 Base.sheet.column_dimensions[cell].width=35
@@ -176,9 +160,7 @@ class TableGenerator(Base):
                 templateText(column='A', row=row, value=time_var,size=14)
                 Base.sheet.row_dimensions[row].height=30
                 Base.sheet[f'A{row}'].fill=fill_main
-                Base.sheet[f'A{row}'].border=border_medium
         templateText(column='A', row=5, value=f'{data_time[0]}:{minutes[0][0]}-{h}:{m}', bold=True)
-        Base.sheet[f'A5'].border=border_medium
         
         self.__clearNode()
 

@@ -13,14 +13,12 @@ import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
+from .tableGenerator import TableGenerator
+
 @api_view(['GET'])
 def xlsxCheck(request, id):
     
     if request.method=='GET':
-
-        current_date = date.today()
-        end_date = current_date + timedelta(days=60)
-        start_date = current_date - timedelta(days=30)
 
         if id == 0:
 
@@ -29,13 +27,12 @@ def xlsxCheck(request, id):
             return Response(serializer.data)
 
         try:    
-            meetings =  Meeting.objects.filter(room_id__id = id, date__range=[start_date, end_date])
+            meetings =  Meeting.objects.filter(Q(room__id = id) & Q(type__exact = ('class')))
         except Meeting.DoesNotExist:
             return Response(status = status.HTTP_404_NOT_FOUND)
 
         serializer = MeetingSerializer(meetings, many = True)
-        template=TableGenerator(data=serializer.data)
-        template.setData()
+        TableGenerator(data=serializer.data, title=id).setData()
         return Response(serializer.data)
         
         
@@ -45,8 +42,9 @@ def meeting_list(request, id):
     if request.method == 'GET':
 
         current_date = date.today()
-        end_date = current_date + timedelta(days=60)
-        start_date = current_date - timedelta(days=30)
+        
+        end_date = current_date + timedelta(days=0)
+        start_date = current_date - timedelta(days=6)
 
         if id == 0:
 
@@ -67,7 +65,6 @@ def meeting_list(request, id):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def meeting_detail(request, id):
