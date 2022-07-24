@@ -4,9 +4,6 @@ from .serializers import MeetingSerializer, RoomSerializer, TargetMail
 from .models import Meeting, Room
 from rest_framework.decorators import api_view
 from rest_framework import status
-from django.core.mail import send_mail, BadHeaderError, EmailMessage
-from django.template.loader import render_to_string
-from django.conf import settings
 from random import randint
 from django.db.models import Q
 import os
@@ -42,9 +39,8 @@ def meeting_list(request, id):
     if request.method == 'GET':
 
         current_date = date.today()
-        
-        end_date = current_date + timedelta(days=0)
-        start_date = current_date - timedelta(days=6)
+        end_date = current_date + timedelta(days=90)
+        start_date = current_date - timedelta(days=60)
 
         if id == 0:
 
@@ -53,7 +49,7 @@ def meeting_list(request, id):
             return Response(serializer.data)
 
         try:    
-            meetings =  Meeting.objects.filter(Q(room__id = id) & (Q(date__range=[start_date, end_date]) | Q(type__exact = ('class'))))
+            meetings =  Meeting.objects.filter(Q(room__id = id,status__exact = ('accepted')) & (Q(date__range=[start_date, end_date]) | Q(type__exact = ('class'))))
         except Meeting.DoesNotExist:
             return Response(status = status.HTTP_404_NOT_FOUND)
 
@@ -64,7 +60,20 @@ def meeting_list(request, id):
         serializer = MeetingSerializer(data = request.data)
         if serializer.is_valid():
             serializer.save()
+            room = Room.objects.get(pk = id)
+
+            message = Mail(
+            from_email='ilkhomzhon.sidikov@gmail.com',
+            to_emails="ilkhom.c@gmail.com",
+            subject='A new event is creteated !',
+            html_content=f'Recieved a new event request for {room}, go to magic.com/admin to "ACCEPT" or "DECLINE" the event')
+            try:
+                sg = SendGridAPIClient("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")
+                sg.send(message)
+            except Exception as e:
+                return Response("Couldn't send email!", status=status.HTTP_408_REQUEST_TIMEOUT)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def meeting_detail(request, id):
@@ -112,7 +121,7 @@ def sendMail(request):
             subject='Email Verification for RRS',
             html_content=f'Your Secret code is: {password}')
         try:
-            sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+            sg = SendGridAPIClient("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")
             response = sg.send(message)
         except Exception as e:
             return Response("Couldn't send email!", status=status.HTTP_408_REQUEST_TIMEOUT)
