@@ -3,7 +3,9 @@ from .base import Base
 from .filter import Filter
 from .style import Style
 from django.conf import settings
+from .cleaner import clearAll
 from os import path
+
 class Node():
     current_index:int=0
     used:int=0
@@ -14,7 +16,7 @@ class TableGenerator(Style):
     def __init__(self,data:list,title:str,timing:dict={'startTime': {'hours':8, 'minutes':00},'endTime':{'hours':24,'minutes':00}},):
 
         self.data=Filter().filter(data)
-        self.title=f"Time table"
+        self.title=f'Time table {title}'
         self.timing=timing
 
         self.week_list=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
@@ -52,8 +54,10 @@ class TableGenerator(Style):
             self.colorCell(column=self.columns[column_A],row=row_A+1, color=subjectColor[name])
             Base.sheet.merge_cells(f'{self.columns[column_A]}{row_A+1}:{self.columns[column_A]}{row_B}')
             self.writeText(column=self.columns[column_A],row=row_A+1,text=cellDesc, fontType='class')
-        dirName=path.join(settings.BASE_DIR, 'xlsxFiles' ,f'{self.title}.xlsx')
-        Base.wb.save(filename=dirName)
+        dirName=path.join(settings.BASE_DIR, 'xlsxFiles')
+        Base.wb.save(filename=path.join(dirName,f'{self.title}.xlsx'))
+        clearAll(dirPath=dirName)
+
 
     def __getTemplate(self):
 

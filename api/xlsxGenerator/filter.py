@@ -2,6 +2,17 @@ from datetime import datetime
 
 class Filter:
 
+    def timeColumn(self,timing:dict={'startTime':{'hours':'08','minutes':'00'},'endTime':{'hours':'00','minutes':'00'},'stepMinute': 30},):
+        timeSlots:list=[]
+        Hour,Minute,stepMinute=map(str,(timing['startTime']['hours'],timing['startTime']['minutes'],timing['stepMinute']))
+        endHour,endMinute=map(str,(timing['endTime']['hours'],timing['endTime']['minutes']))
+        # while True:
+        #     timeSlots.append()
+        #     if f'{Hour}{Minute}'==f'{endHour}{endMinute}':
+        #         break 
+        # print(f'{startHour=}:{startMinute=}:{stepMinute=}')
+        # print(f'{endHour=}:{endMinute=}')
+
     def filter(self,events:list, targets:list=['title','start_time','end_time','date'])->list:
         filtered:list=[]
         for event in events:
@@ -26,4 +37,7 @@ class Filter:
             if event['end_time'][0]=='0':
                 event['end_time']=event['end_time'][1:]
         return events
-            
+    
+
+
+Filter().timeColumn()
