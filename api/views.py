@@ -43,7 +43,7 @@ def meeting_list(request, id):
             from_email='ilkhomzhon.sidikov@gmail.com',
             to_emails="ilkhom.c@gmail.com",
             subject='A new event is creteated !',
-            html_content=f'Recieved a new event request for {room}, go to magic.com/admin to "ACCEPT" or "DECLINE" the event')
+            html_content=f'Recieved a new event request for {room}, go to https://ilkhom19.pythonanywhere.com/admin/ to "ACCEPT" or "DECLINE" the event')
             try:
                 sg = SendGridAPIClient("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")
                 sg.send(message)
