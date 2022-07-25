@@ -60,7 +60,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'email_templates'), os.path.join(BASE_DIR, 'config')],
+        'DIRS': [os.path.join(BASE_DIR, 'email_templates'), os.path.join(BASE_DIR, 'xlsxFiles')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

@@ -2,7 +2,8 @@ from random import choice
 from .base import Base
 from .filter import Filter
 from .style import Style
-
+from django.conf import settings
+from os import path
 class Node():
     current_index:int=0
     used:int=0
@@ -13,7 +14,7 @@ class TableGenerator(Style):
     def __init__(self,data:list,title:str,timing:dict={'startTime': {'hours':8, 'minutes':00},'endTime':{'hours':24,'minutes':00}},):
 
         self.data=Filter().filter(data)
-        self.title=f"Time table of {title}"
+        self.title=f"Time table"
         self.timing=timing
 
         self.week_list=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
@@ -41,9 +42,9 @@ class TableGenerator(Style):
             
             for i, row in enumerate(Base.sheet['A']):
                 if row.value==val['start_time']:
-                    row_A=i
+                    row_A=i #1
                 if row.value==val['end_time']:
-                    row_B=i
+                    row_B=i#2
             for i, column in enumerate(Base.sheet[3]):
                 if column.value==val['day']:
                     column_A=i
@@ -51,8 +52,8 @@ class TableGenerator(Style):
             self.colorCell(column=self.columns[column_A],row=row_A+1, color=subjectColor[name])
             Base.sheet.merge_cells(f'{self.columns[column_A]}{row_A+1}:{self.columns[column_A]}{row_B}')
             self.writeText(column=self.columns[column_A],row=row_A+1,text=cellDesc, fontType='class')
-
-        Base.wb.save(filename=f'{self.title}.xlsx')
+        dirName=path.join(settings.BASE_DIR, 'xlsxFiles' ,f'{self.title}.xlsx')
+        Base.wb.save(filename=dirName)
 
     def __getTemplate(self):
 
@@ -98,7 +99,6 @@ class TableGenerator(Style):
                 self.writeText(column='A', row=row, text=time_var,fontType='general')
                 self.colorCell(column='A', row=row)
                 Base.sheet.row_dimensions[row].height=30
-        self.writeText(column='A', row=5, text=f'{data_time[0]}:{minutes[0][0]}-{h}:{m}',fontType='general')
         
         self.__clearNode()
 

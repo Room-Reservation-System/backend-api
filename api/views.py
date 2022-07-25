@@ -9,7 +9,6 @@ from django.db.models import Q
 import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
-
 from .xlsxGenerator.tableGenerator import TableGenerator
 
 @api_view(['GET'])
