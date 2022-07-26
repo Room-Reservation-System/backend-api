@@ -1,6 +1,12 @@
 from rest_framework import serializers
 from .models import Meeting, Room, TargetMailUser
 
+
+# class FileSerializer(serializers.ModelSerializer):
+#   class Meta():
+#     model = File
+#     fields = ('file', 'remark', 'timestamp')
+
 class MeetingSerializer (serializers.ModelSerializer):
     class Meta:
         model = Meeting

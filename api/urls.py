@@ -1,11 +1,12 @@
 from django.urls import path
-from . import views
+from .views import *
 
 urlpatterns = [
-    path('room/<int:id>', views.meeting_list), # GET, POST   -->  id = class_id
-    path('meeting/<int:id>', views.meeting_detail), # GET, PUT, DELETE -->  id = meeting_id
-    path('rooms/', views.room_list),
-    path('mail/', views.sendMail),              # GET rooms
-    path('qwe/<int:id>', views.xlsxCheck),
+    # path('upload/', FileView.as_view(), name='file-upload'),
+    path('room/<int:id>', meeting_list), # GET, POST   -->  id = class_id
+    path('meeting/<int:id>', meeting_detail), # GET, PUT, DELETE -->  id = meeting_id
+    path('rooms/', room_list),
+    path('mail/', sendMail),              # GET rooms
+    path('qwe/<int:id>', xlsxCheck),
 ]
 

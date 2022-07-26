@@ -2,6 +2,13 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.core.exceptions import ValidationError
 
+
+
+# class File(models.Model):
+#     file = models.FileField(blank=False, null=False)
+#     remark = models.CharField(max_length=64)
+#     timestamp = models.DateTimeField(auto_now_add=True)
+
 class TargetMailUser(models.Model):
     mail=models.CharField(max_length=300)
 

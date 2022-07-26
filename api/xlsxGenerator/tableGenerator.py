@@ -1,3 +1,4 @@
+from fileinput import filename
 from random import choice
 from .base import Base
 from .filter import Filter
@@ -18,6 +19,8 @@ class TableGenerator(Style):
         self.data=Filter().filter(data)
         self.title=f'Time table {title}'
         self.timing=timing
+        self.dirName=path.join(settings.BASE_DIR, 'xlsxFiles')
+        self.fileName=path.join(self.dirName, f'{self.title}.xlsx')
 
         self.week_list=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
         self.columns=['A','B','C','D','E','F','G','H']
@@ -54,9 +57,9 @@ class TableGenerator(Style):
             self.colorCell(column=self.columns[column_A],row=row_A+1, color=subjectColor[name])
             Base.sheet.merge_cells(f'{self.columns[column_A]}{row_A+1}:{self.columns[column_A]}{row_B}')
             self.writeText(column=self.columns[column_A],row=row_A+1,text=cellDesc, fontType='class')
-        dirName=path.join(settings.BASE_DIR, 'xlsxFiles')
-        Base.wb.save(filename=path.join(dirName,f'{self.title}.xlsx'))
-        clearAll(dirPath=dirName)
+
+        Base.wb.save(filename=self.fileName)
+        # clearAll(dirPath=dirName)
 
 
     def __getTemplate(self):
@@ -105,6 +108,9 @@ class TableGenerator(Style):
                 Base.sheet.row_dimensions[row].height=30
         
         self.__clearNode()
+    
+    def getPath(self):
+        return self.fileName
 
     def __getIndex(self,initial_index:int=0):
         local_index:int=Node.current_index+initial_index
