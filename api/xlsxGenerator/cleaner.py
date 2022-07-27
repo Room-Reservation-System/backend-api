@@ -6,5 +6,6 @@ def clearAll(dirPath:str):
     files=[]
     for (dPath,dNames,dFiles) in walk(dirPath):
         files.extend(dFiles)
+        
     for file in files:
         remove(path.join(dirPath,file))

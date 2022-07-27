@@ -4,7 +4,6 @@ from .base import Base
 from .filter import Filter
 from .style import Style
 from django.conf import settings
-from .cleaner import clearAll
 from os import path
 
 class Node():
@@ -26,8 +25,8 @@ class TableGenerator(Style):
         self.columns=['A','B','C','D','E','F','G','H']
 
     def setData(self,):
-        color_fill=[ #'FFCCCC','FFE5CC','FFFFCC','E5FFCC','CCFFCC','CCFFE5','CCFFFF','CCE5FF','CCCCFF','E5CCFF','FFCCFF','FFCCE5',
-                    'FF9999','FFCC99','FFFF99','CCFF99','99FF99','99FFCC','99FFFF','99CCFF','9999FF','CC99FF','FF99FF','FF99CC'
+        colorFill=[ 'FFCCCC','FFE5CC','FFFFCC','E5FFCC','CCFFCC','CCFFE5','CCFFFF','CCE5FF','CCCCFF','E5CCFF','FFCCFF','FFCCE5',
+                    'FFFF99','FFCC99','FF99FF','FF99CC','FF9999','CCFF99','CC99FF','99FFFF','99FFCC','99FF99','99CCFF','9999FF'
         ]
 
         self.__getTemplate()
@@ -42,9 +41,13 @@ class TableGenerator(Style):
             name=val['title'].upper()
             start_time=val['start_time']
             end_time=val['end_time']
-            if name not in subjectColor:
-                subjectColor[name]=choice(color_fill)
-            
+            color=choice(colorFill)
+            if name in subjectColor:
+                color=subjectColor[name]
+            else:
+                subjectColor[name]=color
+                colorFill.remove(color)
+
             for i, row in enumerate(Base.sheet['A']):
                 if row.value==val['start_time']:
                     row_A=i #1
@@ -58,8 +61,9 @@ class TableGenerator(Style):
             Base.sheet.merge_cells(f'{self.columns[column_A]}{row_A+1}:{self.columns[column_A]}{row_B}')
             self.writeText(column=self.columns[column_A],row=row_A+1,text=cellDesc, fontType='class')
 
+        
         Base.wb.save(filename=self.fileName)
-        # clearAll(dirPath=dirName)
+        
 
 
     def __getTemplate(self):
@@ -101,7 +105,6 @@ class TableGenerator(Style):
                 if self.timing['endTime']['hours']%24==value and self.timing['endTime']['minutes']<minute:
                     m=str(self.timing['endTime']['minutes'])
                     if m=='0':m+='0'
-                    h=data_time[-1]
                     break 
                 self.writeText(column='A', row=row, text=time_var,fontType='general')
                 self.colorCell(column='A', row=row)
@@ -109,8 +112,11 @@ class TableGenerator(Style):
         
         self.__clearNode()
     
-    def getPath(self):
+    def getFile(self):
         return self.fileName
+    
+    def getDir(self):
+        return self.dirName
 
     def __getIndex(self,initial_index:int=0):
         local_index:int=Node.current_index+initial_index
