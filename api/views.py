@@ -10,35 +10,15 @@ import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from .xlsxGenerator.tableGenerator import TableGenerator
+from .xlsxGenerator.cleaner import clearAll 
 
-# from rest_framework.views import APIView
-# from rest_framework.parsers import MultiPartParser, FormParser
-from django.core.servers.basehttp import FileWrapper
-from django.http import HttpResponse, StreamingHttpResponse
-import mimetypes
+from django.http import FileResponse
 
-# class FileView(APIView):
-#   parser_classes = (MultiPartParser, FormParser)
-
-#   def post(self, request, *args, **kwargs):
-#     try:    
-#         meetings =  Meeting.objects.filter(Q(room__id = id) & Q(type__exact = ('class')))
-#     except Meeting.DoesNotExist:
-#         return Response(status = status.HTTP_404_NOT_FOUND)
-#     serializer = MeetingSerializer(meetings, many = True)
-#     TableGenerator(data=serializer.data, title=id).setData()
-    
-#     file_serializer = FileSerializer(data=request.data)
-#     if file_serializer.is_valid():
-#       file_serializer.save()
-#       return Response(file_serializer.data, status=status.HTTP_201_CREATED)
-#     else:
-#       return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
 @api_view(['GET'])
-def xlsxCheck(request, id):
+def downloadFile(request, id):
     
     if request.method=='GET':
 
@@ -54,18 +34,16 @@ def xlsxCheck(request, id):
             return Response(status = status.HTTP_404_NOT_FOUND)
 
         serializer = MeetingSerializer(meetings, many = True)
+        
         table=TableGenerator(data=serializer.data, title=id)
+        clearAll(dirPath=table.getDir())
         table.setData()
-        fileName=table.getPath()
-        name=os.path.basename(fileName)
-        chunk_size = 8192
-        response = StreamingHttpResponse(FileWrapper(open(fileName, 'rb'), chunk_size),
-                           content_type=mimetypes.guess_type(fileName)[0])
-        response['Content-Length'] = os.path.getsize(fileName)    
-        response['Content-Disposition'] = "attachment; filename=%s" % name
+        file=open(table.getFile(),'rb')
+        response=FileResponse(file)
+
         return response    
 
-        
+
 @api_view(['GET', 'POST'])
 def meeting_list(request, id):
 
@@ -97,7 +75,7 @@ def meeting_list(request, id):
 
             message = Mail(
             from_email='ilkhomzhon.sidikov@gmail.com',
-            to_emails="ilkhom.c@gmail.com",
+            to_emails="eku.ulanov@gmail.com",
             subject='A new event is creteated !',
             html_content=f'Recieved a new event request for {room}, go to https://ilkhom19.pythonanywhere.com/admin/ to "ACCEPT" or "DECLINE" the event')
             try:
@@ -130,9 +108,6 @@ def meeting_detail(request, id):
     elif request.method == 'DELETE':
         meeting.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-
 
 
 @api_view(['GET'])
