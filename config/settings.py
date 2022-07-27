@@ -15,9 +15,9 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 #templates and project directories
-
 EMAIL_TEMPLATE_DIR=os.path.join(BASE_DIR, 'email_templates')
 XLSXFILES_DIR=os.path.join(BASE_DIR,'xlsxFiles')
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/

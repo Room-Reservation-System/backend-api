@@ -23,7 +23,6 @@ def downloadFile(request, id):
     if request.method=='GET':
 
         if id == 0:
-
             meetings = Meeting.objects.all()
             serializer = MeetingSerializer(meetings, many = True)
             return Response(serializer.data)
