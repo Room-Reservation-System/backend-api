@@ -2,7 +2,6 @@ from openpyxl.styles import PatternFill, Border, Side, Alignment, Font
 from random import choice
 from .base import Base
 from .filter import Filter
-# from .style import Style
 from django.conf import settings
 from os import path
 
@@ -68,13 +67,9 @@ class TableGenerator:
             self.sheet.merge_cells(f'{self.columns[column_A]}{row_A+1}:{self.columns[column_A]}{row_B}')
             self.__writeText(column=self.columns[column_A],row=row_A+1,text=cellDesc, fontType='class')
 
-        
-        # Base.wb.save(filename=self.fileName)
+    
         self.base.saveXlsx()
-        # Base(self.fileName).saveXlsx()
         
-
-
     def __getTemplate(self):
 
         self.sheet.merge_cells('B1:H1')
