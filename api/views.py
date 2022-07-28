@@ -28,6 +28,7 @@ def downloadFile(request, id):
 
         try:    
             meetings =  Meeting.objects.filter(Q(room__id = id) & Q(type__exact = ('class')))
+            
         except Meeting.DoesNotExist:
             return Response(status = status.HTTP_404_NOT_FOUND)
 
