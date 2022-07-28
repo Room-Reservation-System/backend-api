@@ -9,14 +9,11 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-import os
+
 from pathlib import Path
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-#templates and project directories
-EMAIL_TEMPLATE_DIR=os.path.join(BASE_DIR, 'email_templates')
-XLSXFILES_DIR=os.path.join(BASE_DIR,'xlsxFiles')
 
 
 # Quick-start development settings - unsuitable for production
@@ -64,7 +61,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [EMAIL_TEMPLATE_DIR,XLSXFILES_DIR],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -126,34 +123,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+#STATIC_ROOT = "/home/ilkhom19/backend-api/static"
+# or, eg,
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
-
-
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
-
-
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-# email settings:
-EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
-SENDGRID_API_KEY = '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'
-SENDGRID_SANDBOX_MODE_IN_DEBUG=False
-# EMAIL_HOST = 'smtp.mail.ru'
-# EMAIL_HOST_USER = "eku.160500@mail.ru
-# EMAIL_HOST_PASSWORD = "qjZDtn7IHKDnH5G9Q4MC"
-# SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
-# EMAIL_HOST='smtp.sendgrid.net'
-# EMAIL_HOST_USER='apikey'
-# EMAIL_HOST_PASSWORD='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'
-# EMAIL_USE_TLS = True
-# EMAIL_PORT = 587
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
-
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
