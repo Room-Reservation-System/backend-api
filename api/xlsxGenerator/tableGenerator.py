@@ -1,10 +1,10 @@
-from fileinput import filename
+from openpyxl.styles import PatternFill, Border, Side, Alignment, Font
 from random import choice
 from .base import Base
 from .filter import Filter
-from .style import Style
 from django.conf import settings
 from os import path
+
 
 class Node():
     current_index:int=0
@@ -12,17 +12,23 @@ class Node():
     next_index:int=0
 
 
-class TableGenerator(Style):
+class TableGenerator:
+    
     def __init__(self,data:list,title:str,timing:dict={'startTime': {'hours':8, 'minutes':00},'endTime':{'hours':24,'minutes':00}},):
 
         self.data=Filter().filter(data)
         self.title=f'Time table {title}'
         self.timing=timing
+        self.fileName=f'{self.title}.xlsx'
         self.dirName=path.join(settings.BASE_DIR, 'xlsxFiles')
-        self.fileName=path.join(self.dirName, f'{self.title}.xlsx')
+        # self.fileName=path.join(self.dirName, f'{self.title}.xlsx')
 
         self.week_list=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
         self.columns=['A','B','C','D','E','F','G','H']
+
+        self.base=Base(self.fileName)
+        print(self.base)
+        self.sheet=self.base.getWorkSheet()
 
     def setData(self,):
         colorFill=[ 'FFCCCC','FFE5CC','FFFFCC','E5FFCC','CCFFCC','CCFFE5','CCFFFF','CCE5FF','CCCCFF','E5CCFF','FFCCFF','FFCCE5',
@@ -48,41 +54,39 @@ class TableGenerator(Style):
                 subjectColor[name]=color
                 colorFill.remove(color)
 
-            for i, row in enumerate(Base.sheet['A']):
+            for i, row in enumerate(self.sheet['A']):
                 if row.value==val['start_time']:
                     row_A=i #1
                 if row.value==val['end_time']:
                     row_B=i#2
-            for i, column in enumerate(Base.sheet[3]):
+            for i, column in enumerate(self.sheet[3]):
                 if column.value==val['day']:
                     column_A=i
             cellDesc:str=f'{name}\n\n{start_time}-{end_time}'
-            self.colorCell(column=self.columns[column_A],row=row_A+1, color=subjectColor[name])
-            Base.sheet.merge_cells(f'{self.columns[column_A]}{row_A+1}:{self.columns[column_A]}{row_B}')
-            self.writeText(column=self.columns[column_A],row=row_A+1,text=cellDesc, fontType='class')
+            self.__colorCell(column=self.columns[column_A],row=row_A+1, color=subjectColor[name])
+            self.sheet.merge_cells(f'{self.columns[column_A]}{row_A+1}:{self.columns[column_A]}{row_B}')
+            self.__writeText(column=self.columns[column_A],row=row_A+1,text=cellDesc, fontType='class')
 
+    
+        self.base.saveXlsx()
         
-        Base.wb.save(filename=self.fileName)
-        
-
-
     def __getTemplate(self):
 
-        Base.sheet.merge_cells('B1:H1')
-        Base.sheet.row_dimensions[1].height=25
-        self.colorCell(column='B',row=1,color='E0E0E0')
-        self.colorCell(column='A',row=1,color='E0E0E0')
-        self.writeText(column='B', row=1, text=self.title,fontType='title')
+        self.sheet.merge_cells('B1:H1')
+        self.sheet.row_dimensions[1].height=25
+        self.__colorCell(column='B',row=1,color='E0E0E0')
+        self.__colorCell(column='A',row=1,color='E0E0E0')
+        self.__writeText(column='B', row=1, text=self.title,fontType='title')
         
         for i, cell in enumerate(self.columns):
-            Base.sheet.merge_cells(f'{self.columns[i]}3:{self.columns[i]}4')
-            self.colorCell(column=self.columns[i],row=3)
+            self.sheet.merge_cells(f'{self.columns[i]}3:{self.columns[i]}4')
+            self.__colorCell(column=self.columns[i],row=3)
             if cell=='A':
-                Base.sheet.column_dimensions['A'].width=15
-                self.writeText(column='A',row=3,text='Duration')
+                self.sheet.column_dimensions['A'].width=15
+                self.__writeText(column='A',row=3,text='Duration')
             else:
-                Base.sheet.column_dimensions[cell].width=35
-                self.writeText(column=cell, row=3, text=self.week_list[i-1],fontType='general')
+                self.sheet.column_dimensions[cell].width=35
+                self.__writeText(column=cell, row=3, text=self.week_list[i-1],fontType='general')
         data_time=[hour%24 for hour in range (self.timing['startTime']['hours'],self.timing['endTime']['hours']+1)]
         start_minute=self.timing['startTime']['minutes']
         minutes=[]
@@ -106,14 +110,40 @@ class TableGenerator(Style):
                     m=str(self.timing['endTime']['minutes'])
                     if m=='0':m+='0'
                     break 
-                self.writeText(column='A', row=row, text=time_var,fontType='general')
-                self.colorCell(column='A', row=row)
-                Base.sheet.row_dimensions[row].height=30
+                self.__writeText(column='A', row=row, text=time_var,fontType='general')
+                self.__colorCell(column='A', row=row)
+                self.sheet.row_dimensions[row].height=30
         
         self.__clearNode()
+
+    def __textLocation(self,column:str,row:int,wrap_text=True):
+        self.sheet[f'{column}{row}'].alignment=Alignment(horizontal='center',vertical='center',wrap_text=wrap_text)
+
+    def __fontText(self,column:str,row:int,fontType:str):
+        locStyles:dict={'general':{'name':'Arial','size':16,'bold':False,'color':'00000000'},
+                        'generalBold':{'name':'Arial','size':16,'bold':True,'color':'00000000'},
+                        'title':{'name':'Arial','size':22,'bold':True,'color':'00000000'},
+                        'event':{'name':'Arial','size':16,'bold':False,'color':'00000000'},
+                        'class':{'name':'Arial','size':16,'bold':True,'color':'00000000'},
+                        'personal':{},}
+        self.sheet[f'{column}{row}'].font=Font(**locStyles[fontType])
+
+    def __colorCell(self,column:str,row:int,color=None):
+        if color is None:
+            color='E0E0E0'
+        self.sheet[f'{column}{row}'].fill=PatternFill(fill_type='solid',start_color=color,end_color=color, )
+    
+    def __borderStyle(self,column:str,row:int,borderType:str):
+        locBorder=Side(border_style=borderType)
+        self.sheet[f'{column}{row}'].border=Border(left=locBorder,right=locBorder,bottom=locBorder,top=locBorder)
+
+    def __writeText(self,column:str,row:int,text:str,fontType:str='general',wrapText:bool=True):
+        self.sheet[f'{column}{row}']=text
+        self.__textLocation(column=column,row=row,wrap_text=wrapText)
+        self.__fontText(column=column,row=row,fontType=fontType)
     
     def getFile(self):
-        return self.fileName
+        return path.join(self.dirName, self.fileName)
     
     def getDir(self):
         return self.dirName
