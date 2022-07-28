@@ -6,9 +6,41 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from random import randint
 from django.db.models import Q
+from django.http import FileResponse
 import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
+from .xlsxGenerator.tableGenerator import TableGenerator
+from .xlsxGenerator.cleaner import clearAll 
+
+
+
+
+@api_view(['GET'])
+def downloadFile(request, id):
+    
+    if request.method=='GET':
+
+        if id == 0:
+            meetings = Meeting.objects.all()
+            serializer = MeetingSerializer(meetings, many = True)
+            return Response(serializer.data)
+
+        try:    
+            meetings =  Meeting.objects.filter(Q(room__id = id) & Q(type__exact = ('class')))
+        except Meeting.DoesNotExist:
+            return Response(status = status.HTTP_404_NOT_FOUND)
+
+        serializer = MeetingSerializer(meetings, many = True)
+        
+        table=TableGenerator(data=serializer.data, title=id)
+        clearAll(dirPath=table.getDir())
+        table.setData()
+        file=open(table.getFile(),'rb')
+        response=FileResponse(file)
+
+        return response    
+
 
 @api_view(['GET', 'POST'])
 def meeting_list(request, id):
@@ -41,7 +73,7 @@ def meeting_list(request, id):
 
             message = Mail(
             from_email='ilkhomzhon.sidikov@gmail.com',
-            to_emails="ilkhom.c@gmail.com",
+            to_emails="eku.ulanov@gmail.com",
             subject='A new event is creteated !',
             html_content=f'Recieved a new event request for {room}, go to https://ilkhom19.pythonanywhere.com/admin/ to "ACCEPT" or "DECLINE" the event')
             try:
@@ -51,7 +83,6 @@ def meeting_list(request, id):
                 return Response("Couldn't send email!", status=status.HTTP_408_REQUEST_TIMEOUT)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
-
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def meeting_detail(request, id):
@@ -75,7 +106,6 @@ def meeting_detail(request, id):
     elif request.method == 'DELETE':
         meeting.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 
 @api_view(['GET'])
