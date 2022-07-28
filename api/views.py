@@ -6,13 +6,12 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from random import randint
 from django.db.models import Q
+from django.http import FileResponse
 import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from .xlsxGenerator.tableGenerator import TableGenerator
 from .xlsxGenerator.cleaner import clearAll 
-
-from django.http import FileResponse
 
 
 
