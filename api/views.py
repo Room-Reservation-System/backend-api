@@ -135,5 +135,5 @@ def sendMail(request):
             response = sg.send(message)
         except Exception as e:
             return Response("Couldn't send email!", status=status.HTTP_408_REQUEST_TIMEOUT)
-        return Response([address,password,hashed_password], status=status.HTTP_200_OK)
+        return Response([address,hashed_password], status=status.HTTP_200_OK)
     else: return Response(targetMail.errors)
