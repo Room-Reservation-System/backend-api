@@ -12,6 +12,7 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from .xlsxGenerator.tableGenerator import TableGenerator
 from .xlsxGenerator.cleaner import clearAll 
+import hashlib
 
 
 
@@ -73,12 +74,12 @@ def meeting_list(request, id):
             room = Room.objects.get(pk = id)
 
             message = Mail(
-            from_email='ilkhomzhon.sidikov@gmail.com',
+            from_email='ilkhom.c@outlook.com',
             to_emails="eku.ulanov@gmail.com",
             subject='A new event is creteated !',
             html_content=f'Recieved a new event request for {room}, go to https://ilkhom19.pythonanywhere.com/admin/ to "ACCEPT" or "DECLINE" the event')
             try:
-                sg = SendGridAPIClient("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")
+                sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
                 sg.send(message)
             except Exception as e:
                 return Response("Couldn't send email!", status=status.HTTP_408_REQUEST_TIMEOUT)
@@ -122,15 +123,17 @@ def sendMail(request):
     if targetMail.is_valid():
         address=targetMail.data['email']
         password=f'{randint(1000,9999)}'
+        salt = os.environ.get('SALT')
+        hashed_password = hashlib.sha512(password.encode('utf-8') + salt.encode('utf-8')).hexdigest()
         message = Mail(
-            from_email='ilkhomzhon.sidikov@gmail.com',
+            from_email='ilkhom.c@outlook.com',
             to_emails=address,
             subject='Email Verification for RRS',
             html_content=f'Your Secret code is: {password}')
         try:
-            sg = SendGridAPIClient("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")
+            sg = SendGridAPIClient()
             response = sg.send(message)
         except Exception as e:
             return Response("Couldn't send email!", status=status.HTTP_408_REQUEST_TIMEOUT)
-        return Response([address,password], status=status.HTTP_200_OK)
+        return Response([address,password,hashed_password], status=status.HTTP_200_OK)
     else: return Response(targetMail.errors)
