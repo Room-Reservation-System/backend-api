@@ -131,7 +131,7 @@ def sendMail(request):
             subject='Email Verification for RRS',
             html_content=f'Your Secret code is: {password}')
         try:
-            sg = SendGridAPIClient()
+            sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
             response = sg.send(message)
         except Exception as e:
             return Response("Couldn't send email!", status=status.HTTP_408_REQUEST_TIMEOUT)
