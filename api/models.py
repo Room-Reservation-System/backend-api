@@ -6,6 +6,7 @@ class Room (models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=150)
     seats = models.IntegerField(default = 0,validators=[MaxValueValidator(250), MinValueValidator(1)])
+    academic = models.BooleanField(default=False)
     information = models.CharField(max_length=250)
 
     def __str__(self):
