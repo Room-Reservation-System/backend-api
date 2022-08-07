@@ -3,10 +3,12 @@ from .views import *
 
 urlpatterns = [
   
-    path('room/<int:id>', meeting_list), # GET, POST   -->  id = class_id
-    path('meeting/<int:id>', meeting_detail), # GET, PUT, DELETE -->  id = meeting_id
-    path('rooms/', room_list), # GET rooms
+    path('rooms/', room_list),
+    path('cohorts/', cohort_list),
+    path('instructors/', instructor_list),
+    path('events/<int:id>', meeting_list),
+    path('lectures/<int:id>', lecture_list), 
     path('mail/', sendMail),             
-    path('download/<int:id>', downloadFile), #needs an id (class) as a arg
+    path('download/<int:id>', downloadFile), 
 ]
 
