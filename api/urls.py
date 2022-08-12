@@ -8,5 +8,6 @@ urlpatterns = [
     path('rooms/', room_list), # GET rooms
     path('mail/', sendMail),             
     path('download/<int:id>', downloadFile), #needs an id (class) as a arg
+    path('qr/<int:id>',QRcodeGenerator)
 ]
 

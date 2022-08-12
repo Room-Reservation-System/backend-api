@@ -16,6 +16,33 @@ import hashlib
 
 
 
+@api_view(['GET'])
+def QRcodeGenerator(request, id):
+    
+    if request.method=='GET':
+
+        if id == 0:
+            meetings = Meeting.objects.all()
+            serializer = MeetingSerializer(meetings, many = True)
+            return Response(serializer.data)
+
+        try:    
+            meetings =  Meeting.objects.filter(Q(room__id = id) & Q(type__exact = ('class')))
+            
+        except Meeting.DoesNotExist:
+            return Response(status = status.HTTP_404_NOT_FOUND)
+
+        serializer = MeetingSerializer(meetings, many = True)
+        
+
+        link='https://www.youtube.com/watch?v=tXsQJhoauxc'
+        name='demo'
+        QRcodeGenerator().getQRcode(fileName=f'{name}{id}',siteLink=link)
+        # table.setData()
+        # file=open(table.getFile(),'rb')
+        response=FileResponse(QRcodeGenerator().getQRcode(fileName=name,siteLink=link))
+
+        return response
 
 @api_view(['GET'])
 def downloadFile(request, id):
