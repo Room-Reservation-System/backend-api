@@ -36,6 +36,7 @@ class TableGenerator:
         ]
 
         self.__getTemplate()
+        print(self.data)
 
         subjectColor:dict={}
        
