@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 from rest_framework.response import Response
-from .serializers import MeetingSerializer, RoomSerializer, TargetMail
-from .models import Meeting, Room
+from .serializers import *
+from .models import *
 from rest_framework.decorators import api_view
 from rest_framework import status
 from random import randint
@@ -16,33 +16,33 @@ import hashlib
 
 
 
-@api_view(['GET'])
-def QRcodeGenerator(request, id):
+# @api_view(['GET'])
+# def QRcodeGenerator(request, id):
     
-    if request.method=='GET':
+#     if request.method=='GET':
 
-        if id == 0:
-            meetings = Meeting.objects.all()
-            serializer = MeetingSerializer(meetings, many = True)
-            return Response(serializer.data)
+#         if id == 0:
+#             meetings = Meeting.objects.all()
+#             serializer = MeetingSerializer(meetings, many = True)
+#             return Response(serializer.data)
 
-        try:    
-            meetings =  Meeting.objects.filter(Q(room__id = id) & Q(type__exact = ('class')))
+#         try:    
+#             meetings =  Meeting.objects.filter(Q(room__id = id) & Q(type__exact = ('class')))
             
-        except Meeting.DoesNotExist:
-            return Response(status = status.HTTP_404_NOT_FOUND)
+#         except Meeting.DoesNotExist:
+#             return Response(status = status.HTTP_404_NOT_FOUND)
 
-        serializer = MeetingSerializer(meetings, many = True)
+#         serializer = MeetingSerializer(meetings, many = True)
         
 
-        link='https://www.youtube.com/watch?v=tXsQJhoauxc'
-        name='demo'
-        QRcodeGenerator().getQRcode(fileName=f'{name}{id}',siteLink=link)
-        # table.setData()
-        # file=open(table.getFile(),'rb')
-        response=FileResponse(QRcodeGenerator().getQRcode(fileName=name,siteLink=link))
+#         link='https://www.youtube.com/watch?v=tXsQJhoauxc'
+#         name='demo'
+#         QRcodeGenerator().getQRcode(fileName=f'{name}{id}',siteLink=link)
+#         # table.setData()
+#         # file=open(table.getFile(),'rb')
+#         response=FileResponse(QRcodeGenerator().getQRcode(fileName=name,siteLink=link))
 
-        return response
+#         return response
 
 @api_view(['GET'])
 def downloadFile(request, id):
@@ -87,7 +87,7 @@ def meeting_list(request, id):
             return Response(serializer.data)
 
         try:    
-            meetings =  Meeting.objects.filter(Q(room__id = id,status__exact = ('accepted')) & (Q(date__range=[start_date, end_date]) | Q(type__exact = ('class'))))
+            meetings =  Meeting.objects.filter(Q(room__id = id,status__exact = ('accepted')) & (Q(date__range=[start_date, end_date])))
         except Meeting.DoesNotExist:
             return Response(status = status.HTTP_404_NOT_FOUND)
 
@@ -113,34 +113,61 @@ def meeting_list(request, id):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET', 'PUT', 'DELETE'])
-def meeting_detail(request, id):
 
-    try:    
-       meeting =  Meeting.objects.get(pk=id)
-    except Meeting.DoesNotExist:
-        return Response(status = status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'GET':
-        serializer = MeetingSerializer(meeting)
+@api_view(['GET'])
+def lecture_list(request, id):
+    if id == 0:
+        meetings = Lecture.objects.all()
+        serializer = LectureSerializer(meetings, many = True)
         return Response(serializer.data)
+    try:    
+        meetings =  Lecture.objects.filter(room__id = id)
+    except Lecture.DoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+    serializer = LectureSerializer(meetings, many = True)
+    return Response(serializer.data)
 
-    elif request.method == 'PUT':
-        serializer = MeetingSerializer(meeting, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
-    elif request.method == 'DELETE':
-        meeting.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+# @api_view(['GET', 'PUT', 'DELETE'])
+# def meeting_detail(request, id):
+
+#     try:    
+#        meeting =  Meeting.objects.get(pk=id)
+#     except Meeting.DoesNotExist:
+#         return Response(status = status.HTTP_404_NOT_FOUND)
+
+#     if request.method == 'GET':
+#         serializer = MeetingSerializer(meeting)
+#         return Response(serializer.data)
+
+#     elif request.method == 'PUT':
+#         serializer = MeetingSerializer(meeting, data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+#     elif request.method == 'DELETE':
+#         meeting.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['GET'])
 def room_list(request):
     rooms = Room.objects.all()
     serializer = RoomSerializer(rooms, many = True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def cohort_list(request):
+    cohorts = Cohort.objects.all()
+    serializer = CohortSerializer(cohorts, many = True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def instructor_list(request):
+    instructors = Instructor.objects.all()
+    serializer = InstructorSerializer(instructors, many = True)
     return Response(serializer.data)
 
 @api_view(['POST'])

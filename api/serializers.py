@@ -1,15 +1,31 @@
 from rest_framework import serializers
-from .models import Meeting, Room
+from .models import *
 
 class MeetingSerializer (serializers.ModelSerializer):
     class Meta:
         model = Meeting
-        fields = ['id','title','description','date','start_time','end_time','room','type','email','status']
+        fields = '__all__'
 
 class RoomSerializer (serializers.ModelSerializer):
     class Meta:
         model = Room
-        fields = ['id','academic','name','seats','information']
+        fields = '__all__'
+
+class CohortSerializer (serializers.ModelSerializer):
+    class Meta:
+        model = Cohort
+        fields = '__all__'
+
+class InstructorSerializer (serializers.ModelSerializer):
+    class Meta:
+        model = Instructor
+        fields = '__all__'
+
+class LectureSerializer (serializers.ModelSerializer):
+    class Meta:
+        model = Lecture
+        fields = '__all__'
+
 
 class TargetMail(serializers.Serializer):
     email=serializers.CharField(max_length=300)

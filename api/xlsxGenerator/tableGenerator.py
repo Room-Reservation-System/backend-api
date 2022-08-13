@@ -67,7 +67,6 @@ class TableGenerator:
             self.sheet.merge_cells(f'{self.columns[column_A]}{row_A+1}:{self.columns[column_A]}{row_B}')
             self.__writeText(column=self.columns[column_A],row=row_A+1,text=cellDesc, fontType='class')
 
-    
         self.base.saveXlsx()
         
     def __getTemplate(self):
