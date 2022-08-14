@@ -59,7 +59,8 @@ def downloadFile(request, id):
         
     table=TableGenerator(data=serializer.data, title=id)
     clearAll(dirPath=table.getDir())
-    table.setData()
+    # table.setDataClassMode()
+    table.setDataCohortMode()
     file=open(table.getFile(),'rb')
     response=FileResponse(file)
 

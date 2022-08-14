@@ -5,7 +5,7 @@ urlpatterns = [
   
     path('rooms/', room_list),
     path('events/<int:id>', event_list),
-    path('lectures/<int:id>', lecture_list), 
+    path('lectures/<int:id>', lecture_list),    
 
     path('cohorts/', cohort_list),
     path('cohort/<int:id>', per_cohort),

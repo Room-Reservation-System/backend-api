@@ -3,7 +3,6 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.core.exceptions import ValidationError
 
 
-
 class Room (models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=150)
@@ -28,6 +27,7 @@ class Instructor (models.Model):
 class Cohort (models.Model):
     major = models.CharField(max_length=2,choices=(('CS','Computer Science'),('CM','Communications and Media')), blank=False, default='cs')
     year = models.IntegerField(default = 2025)
+    # classColor = models.CharField(max_length=300)
 
     def __str__(self):
         return str(self.major+' - '+str(self.year))
@@ -67,7 +67,6 @@ class Lecture (models.Model):
         return self.title
     class Meta:
         ordering = ['day']
-
 
 
 class Meeting (models.Model):
