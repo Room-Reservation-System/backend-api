@@ -67,7 +67,7 @@ def downloadFile(request, id):
 
 
 @api_view(['GET', 'POST'])
-def meeting_list(request, id):
+def event_list(request, id):
 
     if request.method == 'GET':
 
@@ -120,6 +120,28 @@ def lecture_list(request, id):
     except Lecture.DoesNotExist:
         return Response(status = status.HTTP_404_NOT_FOUND)
     serializer = LectureSerializer(meetings, many = True)
+    return Response(serializer.data)
+
+
+
+@api_view(['GET'])
+def per_cohort(request, id):
+    try:    
+        lectures =  Lecture.objects.filter(cohort__id = id)
+    except Lecture.DoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+    serializer = LectureSerializer(lectures, many = True)
+    return Response(serializer.data)
+
+
+
+@api_view(['GET'])
+def per_instructor(request, id):
+    try:    
+        lectures =  Lecture.objects.filter(instructor__id = id)
+    except Lecture.DoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+    serializer = LectureSerializer(lectures, many = True)
     return Response(serializer.data)
 
 
