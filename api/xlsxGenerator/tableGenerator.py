@@ -2,6 +2,7 @@ from openpyxl.styles import PatternFill, Border, Side, Alignment, Font
 from random import choice
 from .base import Base
 from .filter import Filter
+from .objectsType import ScheduleTime
 from django.conf import settings
 from os import path
 
@@ -11,6 +12,19 @@ class Node():
     used:int=0
     next_index:int=0
 
+class TemplateGenerator:
+    def __init__(self,title:str,workHours:ScheduleTime=ScheduleTime(startHour=9, startMinute=0, endHour=24, endMinute=0),step:int=30):
+
+        self.workHours=workHours
+        self.fileName=f'{title}.xlsx'
+        self.dirName=path.join(settings.BASE_DIR, 'xlsxFiles')
+
+        self.week_list=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+        self.columns=['A','B','C','D','E','F','G','H']
+
+        self.base=Base(self.fileName)
+        print(self.base)
+        self.sheet=self.base.getWorkSheet()
 
 class TableGenerator:
     
