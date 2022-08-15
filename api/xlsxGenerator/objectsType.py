@@ -5,3 +5,7 @@ class ScheduleTime(NamedTuple):
     startMinute:int
     endHour:int
     endMinute:int
+
+class Group(NamedTuple):
+    groupOne:str
+    groupTwo:str

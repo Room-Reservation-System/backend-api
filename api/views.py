@@ -43,9 +43,26 @@ import hashlib
 #         response=FileResponse(QRcodeGenerator().getQRcode(fileName=name,siteLink=link))
 
 #         return response
+@api_view(['GET'])
+def downloadXlsxCohortMode(request, id):
+    
+    try:    
+        lectures =  Lecture.objects.filter(cohort__id = id)
+    except Lecture.DoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+    serializer = LectureSerializer(lectures, many = True)
+    # return Response(serializer.data)
+
+    table=TableGenerator(data=serializer.data, title=id)
+    table.setDataCohortMode()
+    file=open(table.getFile(),'rb')
+    response=FileResponse(file)
+    # return response
+    return Response(serializer.data)
+
 
 @api_view(['GET'])
-def downloadFile(request, id):
+def downloadXlsxClassMode(request, id):
     
     if id == 0:
         meetings = Lecture.objects.all()
@@ -57,14 +74,14 @@ def downloadFile(request, id):
         return Response(status = status.HTTP_404_NOT_FOUND)
     serializer = LectureSerializer(meetings, many = True)
         
+
     table=TableGenerator(data=serializer.data, title=id)
-    clearAll(dirPath=table.getDir())
-    # table.setDataClassMode()
-    table.setDataCohortMode()
+    table.setDataClassMode()
     file=open(table.getFile(),'rb')
     response=FileResponse(file)
 
-    return response    
+    # return response   
+    return Response(serializer.data) 
 
 
 @api_view(['GET', 'POST'])
@@ -135,7 +152,6 @@ def per_cohort(request, id):
     return Response(serializer.data)
 
 
-
 @api_view(['GET'])
 def per_instructor(request, id):
     try:    
@@ -144,30 +160,6 @@ def per_instructor(request, id):
         return Response(status = status.HTTP_404_NOT_FOUND)
     serializer = LectureSerializer(lectures, many = True)
     return Response(serializer.data)
-
-
-# @api_view(['GET', 'PUT', 'DELETE'])
-# def meeting_detail(request, id):
-
-#     try:    
-#        meeting =  Meeting.objects.get(pk=id)
-#     except Meeting.DoesNotExist:
-#         return Response(status = status.HTTP_404_NOT_FOUND)
-
-#     if request.method == 'GET':
-#         serializer = MeetingSerializer(meeting)
-#         return Response(serializer.data)
-
-#     elif request.method == 'PUT':
-#         serializer = MeetingSerializer(meeting, data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data)
-#         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
-
-#     elif request.method == 'DELETE':
-#         meeting.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['GET'])
@@ -209,3 +201,28 @@ def sendMail(request):
             return Response("Couldn't send email!", status=status.HTTP_408_REQUEST_TIMEOUT)
         return Response([address,hashed_password], status=status.HTTP_200_OK)
     else: return Response(targetMail.errors)
+
+
+
+# @api_view(['GET', 'PUT', 'DELETE'])
+# def meeting_detail(request, id):
+
+#     try:    
+#        meeting =  Meeting.objects.get(pk=id)
+#     except Meeting.DoesNotExist:
+#         return Response(status = status.HTTP_404_NOT_FOUND)
+
+#     if request.method == 'GET':
+#         serializer = MeetingSerializer(meeting)
+#         return Response(serializer.data)
+
+#     elif request.method == 'PUT':
+#         serializer = MeetingSerializer(meeting, data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+#     elif request.method == 'DELETE':
+#         meeting.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)

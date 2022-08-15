@@ -14,7 +14,8 @@ urlpatterns = [
     path('instructor/<int:id>', per_instructor),
 
     path('mail/', sendMail),             
-    path('download/<int:id>', downloadFile), #needs an id (class) as a arg
+    path('downloadxlsxclassmode/<int:id>', downloadXlsxClassMode), #needs an id (class) as a arg
+    path('downloadxlsxcohortmode/<int:id>', downloadXlsxCohortMode),
     # path('qr/<int:id>',QRcodeGenerator)
 
 

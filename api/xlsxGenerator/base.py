@@ -1,6 +1,7 @@
 from openpyxl import Workbook, load_workbook
 from django.conf import settings
 from os import path, walk
+from .cleaner import clearAll
 
 class Base:
     
@@ -14,6 +15,8 @@ class Base:
         files=[]
         for (dPath,dNames,dFiles) in walk(self.folderDir):
             files.extend(dFiles)
+        if not files:
+            clearAll(dirPath=self.filePath)
         if self.fileName in files:
             with open(self.filePath, 'rb') as xlsx:
                 self.workBook=load_workbook(xlsx)
