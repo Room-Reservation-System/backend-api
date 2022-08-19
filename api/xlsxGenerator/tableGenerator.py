@@ -2,7 +2,7 @@ from openpyxl.styles import (PatternFill, Border, Side, Alignment, Font)
 from random import choice
 from .base import Base
 from .filter import Filter
-from .objectsType import ScheduleTime, Group
+from .objectsType import ScheduleTime, Group, TypeXlsx
 from .cleaner import clearAll
 from django.conf import settings
 from os import path
@@ -16,10 +16,12 @@ class Node():
 
 class TableGenerator:
     
-    def __init__(self,data:list,title:str,workHours:ScheduleTime=ScheduleTime(startHour=9, startMinute=0, endHour=24, endMinute=0),step:int=30,):
+    def __init__(self,data:TypeXlsx,workHours:ScheduleTime=ScheduleTime(startHour=9, startMinute=0, endHour=24, endMinute=0),step:int=30,):
 
-        self.data=Filter().filter(data)
-        self.title=f'Time table {title}'
+        self.xlsxData=data['dataList']
+        self.year=data['header']['year']
+        self.major=data['header']['major']
+        self.title=f'Timetable for {self.major}-{self.year}'
         self.workHours=workHours
         self.step=step
         self.fileName=f'{self.title}.xlsx'
@@ -46,19 +48,58 @@ class TableGenerator:
                         '69':'FFFFFF'}
         columns=['A','B','C','D','E','F','G','H','I','J','K']
         self.getCohortTemplate(group=group)
+        for val in self.xlsxData:
+            
+            row_A:int=0
+            row_B:int=0        
+            columnCS:int=0
+            columnArt:int=0
+            name=val['title'].upper()
+            start_time=val['start_time']
+            end_time=val['end_time']
+
+            for i, row in enumerate(self.sheet['A']):
+                if row.value==val['start_time']:
+                    row_A=i #1
+                if row.value==val['end_time']:
+                    row_B=i#2
+            for i in range(1,len(columns),2):
+                if self.sheet[f'{columns[i]}{3}']==val['day']:
+                    # for self.sheet[f{}{}]
+                    
+                    columnCS=i
+            cellDesc:str=f'{name}\n\n{start_time}-{end_time}'
+            self.colorCell(column=columns[columnCS],row=row_A+1, color=roomColor[str(val['room'])])
+            self.sheet.merge_cells(f'{columns[columnCS]}{row_A+1}:{columns[columnCS]}{row_B}')
+            self.writeText(column=columns[columnCS],row=row_A+1,text=cellDesc, fontType='class')
 
         self.base.saveXlsx()
-    def setDataClassMode(self,):
+
+
+        self.base.saveXlsx()
+    def setDataClassMode(self):
         columns=['A','B','C','D','E','F','G','H']
         colorFill=[ 'FFCCCC','FFE5CC','FFFFCC','E5FFCC','CCFFCC','CCFFE5','CCFFFF','CCE5FF','CCCCFF','E5CCFF','FFCCFF','FFCCE5',
                     'FFFF99','FFCC99','FF99FF','FF99CC','FF9999','CCFF99','CC99FF','99FFFF','99FFCC','99FF99','99CCFF','9999FF'
         ]
+        roomColor:dict={'201':'FF0000',
+                        '202':'FFFFFF',
+                        '203':'D0CECE',
+                        '204':'92D050',
+                        '206':'CC99FF',
+                        '209':'FFFF00',
+                        '109':'F8CBAD',
+                        '111':'FFC000',
+                        'B14':'9BC2E6',
+                        '3.28':'D9E1F2',
+                        'CreativeRoom':'00FFFF',
+                        '69':'FFFFFF'}
 
         self.getEventTemplate()
 
         subjectColor:dict={}
        
-        for val in self.data:
+        for val in self.xlsxData:
             
             row_A:int=0
             row_B:int=0        
@@ -82,7 +123,8 @@ class TableGenerator:
                 if column.value==val['day']:
                     column_A=i
             cellDesc:str=f'{name}\n\n{start_time}-{end_time}'
-            self.colorCell(column=columns[column_A],row=row_A+1, color=subjectColor[name])
+            # self.colorCell(column=columns[column_A],row=row_A+1, color=subjectColor[name])
+            self.colorCell(column=columns[column_A],row=row_A+1, color=roomColor[str(val['room'])])
             self.sheet.merge_cells(f'{columns[column_A]}{row_A+1}:{columns[column_A]}{row_B}')
             self.writeText(column=columns[column_A],row=row_A+1,text=cellDesc, fontType='class')
 
@@ -90,7 +132,6 @@ class TableGenerator:
         
     def getCohortTemplate(self,group:Group):
         
-
         columns=['A','B','C','D','E','F','G','H','I','J','K']
         #resize cells and coloring:
         for col in range(len(columns)):
@@ -133,8 +174,6 @@ class TableGenerator:
                 self.sheet.column_dimensions[cell].width=35
                 self.writeText(column=cell, row=3, text=self.week_list[i-1],fontType='general')
       
-    
-
     def textLocation(self,column:str,row:int,wrap_text=True):
         self.sheet[f'{column}{row}'].alignment=Alignment(horizontal='center',vertical='center',wrap_text=wrap_text)
 
@@ -143,7 +182,7 @@ class TableGenerator:
                         'generalBold':{'name':'Arial','size':16,'bold':True,'color':'00000000'},
                         'title':{'name':'Arial','size':22,'bold':True,'color':'00000000'},
                         'event':{'name':'Arial','size':16,'bold':False,'color':'00000000'},
-                        'class':{'name':'Arial','size':16,'bold':True,'color':'00000000'},
+                        'class':{'name':'Arial','size':14,'bold':True,'color':'00000000'},
                         'personal':{},}
         self.sheet[f'{column}{row}'].font=Font(**locStyles[fontType])
 

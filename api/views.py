@@ -11,9 +11,8 @@ import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from .xlsxGenerator.tableGenerator import TableGenerator
-from .xlsxGenerator.cleaner import clearAll 
+from .xlsxGenerator.filter import Filter
 import hashlib
-
 
 
 # @api_view(['GET'])
@@ -42,16 +41,31 @@ import hashlib
 #         # file=open(table.getFile(),'rb')
 #         response=FileResponse(QRcodeGenerator().getQRcode(fileName=name,siteLink=link))
 
-#         return response
 @api_view(['GET'])
-def downloadXlsxCohortMode(request, id):
+def xlsxForCohorts(request, id):
     
     try:    
         lectures =  Lecture.objects.filter(cohort__id = id)
+        cohorts = Cohort.objects.filter(id=id)
+    except Lecture.DoesNotExist or Cohort.DoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+    lectureData = LectureSerializer(lectures, many = True)
+    cohortData=CohortSerializer(cohorts, many = True)
+    mainData=Filter().filter(events=lectureData.data,header=cohortData.data)
+    table=TableGenerator(data=mainData).setDataClassMode()
+    file=open(table.getFile(),'rb')
+    response=FileResponse(file)
+    return response
+
+@api_view(['GET'])
+def xlsxForFaculty(request, id):
+    
+    try:    
+        lectures =  Lecture.objects.filter(cohort__id = id)
+
     except Lecture.DoesNotExist:
         return Response(status = status.HTTP_404_NOT_FOUND)
     serializer = LectureSerializer(lectures, many = True)
-    # return Response(serializer.data)
 
     table=TableGenerator(data=serializer.data, title=id)
     table.setDataCohortMode()
@@ -62,26 +76,42 @@ def downloadXlsxCohortMode(request, id):
 
 
 @api_view(['GET'])
-def downloadXlsxClassMode(request, id):
-    
-    if id == 0:
-        meetings = Lecture.objects.all()
-        serializer = LectureSerializer(meetings, many = True)
-        return Response(serializer.data)
-    try:    
-        meetings =  Lecture.objects.filter(room__id = id)
-    except Lecture.DoesNotExist:
-        return Response(status = status.HTTP_404_NOT_FOUND)
-    serializer = LectureSerializer(meetings, many = True)
+def xlsxGroupMode(request, id):
+    idCS=id
+    idCM=id
+    if id%2:
+        idCS+=1
+    else:
+        idCM-=1
         
+    try:    
+        lecturesForCS =  Lecture.objects.filter(cohort__id = idCS)
+        lecturesForCM = Lecture.objects.filter(cohort__id = idCM)
+        cohortCS = Cohort.objects.filter(id=idCS)
+        cohortCM = Cohort.objects.filter(id=idCM)
 
-    table=TableGenerator(data=serializer.data, title=id)
-    table.setDataClassMode()
-    file=open(table.getFile(),'rb')
-    response=FileResponse(file)
+    except Lecture.DoesNotExist or Cohort.DoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
 
-    # return response   
-    return Response(serializer.data) 
+    groupCS = LectureSerializer(lecturesForCS, many = True).data
+    headerCS = CohortSerializer(cohortCS, many = True).data[0]
+    dataCS=Filter().filter(events=groupCS,group=headerCS['major'],header=headerCS)
+
+    groupCM = LectureSerializer(lecturesForCM, many = True).data
+    headerCM = CohortSerializer(cohortCM, many = True).data[0]
+    dataCM=Filter().filter(events=groupCM,group=headerCM['major'],header=headerCM)
+
+    # groupUnion.extend(LectureSerializer(lecturesForArts, many = True).data)
+    
+    # headerUnion+=(CohortSerializer(cohortsArts, many = True).data)
+    
+    # table=TableGenerator(data=serializer.data, title=id)
+    # table.setDataCohortMode()
+    # file=open(table.getFile(),'rb')
+    # response=FileResponse(file)
+    # # return response
+    dataCS.add({'dataList':dataCM['dataList']})
+    return Response(dataCS)
 
 
 @api_view(['GET', 'POST'])
