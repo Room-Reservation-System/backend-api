@@ -41,18 +41,36 @@ import hashlib
 #         # file=open(table.getFile(),'rb')
 #         response=FileResponse(QRcodeGenerator().getQRcode(fileName=name,siteLink=link))
 
+# @api_view(['GET'])
+# def xlsxForCohorts(request, id):
+    
+#     try:    
+#         lectures =  Lecture.objects.filter(cohort__id = id)
+#         cohorts = Cohort.objects.filter(id=id)
+#     except Lecture.DoesNotExist or Cohort.DoesNotExist:
+#         return Response(status = status.HTTP_404_NOT_FOUND)
+#     lectureData = LectureSerializer(lectures, many = True)
+#     cohortData=CohortSerializer(cohorts, many = True)
+
+#     mainData=Filter().filter(events=lectureData.data,header=cohortData.data)
+#     table=TableGenerator(data=mainData).setDataClassMode()
+#     file=open(table.getFile(),'rb')
+#     response=FileResponse(file)
+#     return response
+
 @api_view(['GET'])
-def xlsxForCohorts(request, id):
+def xlsxForRoom(request, id):
     
     try:    
-        lectures =  Lecture.objects.filter(cohort__id = id)
-        cohorts = Cohort.objects.filter(id=id)
-    except Lecture.DoesNotExist or Cohort.DoesNotExist:
+        lectures =  Lecture.objects.filter(room__id = id)
+    except Lecture.DoesNotExist:
         return Response(status = status.HTTP_404_NOT_FOUND)
-    lectureData = LectureSerializer(lectures, many = True)
-    cohortData=CohortSerializer(cohorts, many = True)
-    mainData=Filter().filter(events=lectureData.data,header=cohortData.data)
-    table=TableGenerator(data=mainData).setDataClassMode()
+    lectureData = LectureSerializer(lectures, many = True).data
+    roomData=Filter().filterRoom(roomData=lectureData)
+    headerData=Filter().filterHeader(header=id)
+    # return Response(headerData)
+    table=TableGenerator(title=headerData)
+    table.setDataRoomMode(data=roomData['dataList'])
     file=open(table.getFile(),'rb')
     response=FileResponse(file)
     return response
@@ -61,22 +79,23 @@ def xlsxForCohorts(request, id):
 def xlsxForFaculty(request, id):
     
     try:    
-        lectures =  Lecture.objects.filter(cohort__id = id)
-
-    except Lecture.DoesNotExist:
+        lectures =  Lecture.objects.filter(instructor__id = id)
+        faculty = Instructor.objects.filter(id = id)
+    except Lecture.DoesNotExist or Instructor.DoesNotExist:
         return Response(status = status.HTTP_404_NOT_FOUND)
-    serializer = LectureSerializer(lectures, many = True)
+    classes = LectureSerializer(lectures, many = True).data
+    instructor = InstructorSerializer(faculty, many = True).data
+    data=Filter().filterInstractor(classes=classes,instructor=instructor[0])
 
-    table=TableGenerator(data=serializer.data, title=id)
-    table.setDataCohortMode()
+    table=TableGenerator(title=data['instructor'])
+    table.setDataFaculty(data=data['classes'], )
     file=open(table.getFile(),'rb')
     response=FileResponse(file)
-    # return response
-    return Response(serializer.data)
+    return response
 
 
 @api_view(['GET'])
-def xlsxGroupMode(request, id):
+def xlsxForCohort(request, id):
     idCS=id
     idCM=id
     if id%2:
@@ -92,26 +111,23 @@ def xlsxGroupMode(request, id):
 
     except Lecture.DoesNotExist or Cohort.DoesNotExist:
         return Response(status = status.HTTP_404_NOT_FOUND)
-
+    filter=Filter()
     groupCS = LectureSerializer(lecturesForCS, many = True).data
     headerCS = CohortSerializer(cohortCS, many = True).data[0]
-    dataCS=Filter().filter(events=groupCS,group=headerCS['major'],header=headerCS)
+    dataCS=filter.filterRoom(roomData=groupCS,group=headerCS['major'])
 
     groupCM = LectureSerializer(lecturesForCM, many = True).data
     headerCM = CohortSerializer(cohortCM, many = True).data[0]
-    dataCM=Filter().filter(events=groupCM,group=headerCM['major'],header=headerCM)
+    dataCM=filter.filterRoom(roomData=groupCM,group=headerCM['major'])
 
-    # groupUnion.extend(LectureSerializer(lecturesForArts, many = True).data)
-    
-    # headerUnion+=(CohortSerializer(cohortsArts, many = True).data)
-    
-    # table=TableGenerator(data=serializer.data, title=id)
-    # table.setDataCohortMode()
-    # file=open(table.getFile(),'rb')
-    # response=FileResponse(file)
-    # # return response
-    dataCS.add({'dataList':dataCM['dataList']})
-    return Response(dataCS)
+    mergedData=filter.mergeData(dict1=dataCM,dict2=dataCS)
+    title=filter.mergeHeader(dict1=headerCS,dict2=headerCM)
+    table=TableGenerator(title=title,step=15)
+    table.setDataCohortMode(data=mergedData,)
+    file=open(table.getFile(),'rb')
+    # return Response(mergedData)
+    response=FileResponse(file)
+    return response
 
 
 @api_view(['GET', 'POST'])

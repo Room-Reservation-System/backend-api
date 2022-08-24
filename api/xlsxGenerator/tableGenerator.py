@@ -16,12 +16,9 @@ class Node():
 
 class TableGenerator:
     
-    def __init__(self,data:TypeXlsx,workHours:ScheduleTime=ScheduleTime(startHour=9, startMinute=0, endHour=24, endMinute=0),step:int=30,):
+    def __init__(self,title:str,workHours:ScheduleTime=ScheduleTime(startHour=9, startMinute=0, endHour=24, endMinute=0),step:int=30,):
 
-        self.xlsxData=data['dataList']
-        self.year=data['header']['year']
-        self.major=data['header']['major']
-        self.title=f'Timetable for {self.major}-{self.year}'
+        self.title=f'Timetable for {title}'
         self.workHours=workHours
         self.step=step
         self.fileName=f'{self.title}.xlsx'
@@ -29,12 +26,7 @@ class TableGenerator:
         self.week_list=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
         self.base=Base(self.fileName)
         self.sheet=self.base.getWorkSheet()
-        self.setBaseTemplate()
-        self.setTimeColumn()
-
-    def setDataCohortMode(self,group:Group=Group(groupOne='Cohort One: Arts',groupTwo='Cohort Two: Sciences')):
-        groupOne,groupTwo=group
-        roomColor:dict={'201':'FF0000',
+        self.roomColor:dict={'201':'FF0000',
                         '202':'FFFFFF',
                         '203':'D0CECE',
                         '204':'92D050',
@@ -46,60 +38,51 @@ class TableGenerator:
                         '3.28':'D9E1F2',
                         'CreativeRoom':'00FFFF',
                         '69':'FFFFFF'}
+        self.setBaseTemplate()
+        self.setTimeColumn()
+
+    def setDataCohortMode(self,data,group:Group=Group(groupOne='Cohort One: Arts',groupTwo='Cohort Two: Sciences')):
+        groupOne,groupTwo=group
+        
         columns=['A','B','C','D','E','F','G','H','I','J','K']
+        # cohort={'Arts':}
         self.getCohortTemplate(group=group)
-        for val in self.xlsxData:
+        for val in data:
             
             row_A:int=0
             row_B:int=0        
             columnCS:int=0
-            columnArt:int=0
             name=val['title'].upper()
             start_time=val['start_time']
             end_time=val['end_time']
+            room=val['room']
 
             for i, row in enumerate(self.sheet['A']):
                 if row.value==val['start_time']:
                     row_A=i #1
                 if row.value==val['end_time']:
                     row_B=i#2
-            for i in range(1,len(columns),2):
-                if self.sheet[f'{columns[i]}{3}']==val['day']:
-                    # for self.sheet[f{}{}]
-                    
+            for i in range(1,len(columns)):
+                if self.sheet[f'{columns[i]}{3}'].value==val['day']:
                     columnCS=i
-            cellDesc:str=f'{name}\n\n{start_time}-{end_time}'
-            self.colorCell(column=columns[columnCS],row=row_A+1, color=roomColor[str(val['room'])])
+                    if val['group']=='CS':
+                        columnCS+=1
+
+            cellDesc:str=f'{name}\n\n{start_time}-{end_time}\nroom:{room}'
+            self.colorCell(column=columns[columnCS],row=row_A+1, color=self.roomColor[str(val['room'])])
             self.sheet.merge_cells(f'{columns[columnCS]}{row_A+1}:{columns[columnCS]}{row_B}')
             self.writeText(column=columns[columnCS],row=row_A+1,text=cellDesc, fontType='class')
 
         self.base.saveXlsx()
 
 
-        self.base.saveXlsx()
-    def setDataClassMode(self):
+    def setDataRoomMode(self,data):
         columns=['A','B','C','D','E','F','G','H']
-        colorFill=[ 'FFCCCC','FFE5CC','FFFFCC','E5FFCC','CCFFCC','CCFFE5','CCFFFF','CCE5FF','CCCCFF','E5CCFF','FFCCFF','FFCCE5',
-                    'FFFF99','FFCC99','FF99FF','FF99CC','FF9999','CCFF99','CC99FF','99FFFF','99FFCC','99FF99','99CCFF','9999FF'
-        ]
-        roomColor:dict={'201':'FF0000',
-                        '202':'FFFFFF',
-                        '203':'D0CECE',
-                        '204':'92D050',
-                        '206':'CC99FF',
-                        '209':'FFFF00',
-                        '109':'F8CBAD',
-                        '111':'FFC000',
-                        'B14':'9BC2E6',
-                        '3.28':'D9E1F2',
-                        'CreativeRoom':'00FFFF',
-                        '69':'FFFFFF'}
+      
 
-        self.getEventTemplate()
+        self.getRoomTemplate()
 
-        subjectColor:dict={}
-       
-        for val in self.xlsxData:
+        for val in data:
             
             row_A:int=0
             row_B:int=0        
@@ -107,12 +90,7 @@ class TableGenerator:
             name=val['title'].upper()
             start_time=val['start_time']
             end_time=val['end_time']
-            color=choice(colorFill)
-            if name in subjectColor:
-                color=subjectColor[name]
-            else:
-                subjectColor[name]=color
-                colorFill.remove(color)
+          
 
             for i, row in enumerate(self.sheet['A']):
                 if row.value==val['start_time']:
@@ -124,7 +102,40 @@ class TableGenerator:
                     column_A=i
             cellDesc:str=f'{name}\n\n{start_time}-{end_time}'
             # self.colorCell(column=columns[column_A],row=row_A+1, color=subjectColor[name])
-            self.colorCell(column=columns[column_A],row=row_A+1, color=roomColor[str(val['room'])])
+            self.colorCell(column=columns[column_A],row=row_A+1, color=self.roomColor[str(val['room'])])
+            self.sheet.merge_cells(f'{columns[column_A]}{row_A+1}:{columns[column_A]}{row_B}')
+            self.writeText(column=columns[column_A],row=row_A+1,text=cellDesc, fontType='class')
+
+        self.base.saveXlsx()
+
+
+    def setDataFaculty(self,data):
+        columns=['A','B','C','D','E','F','G','H']
+       
+        self.getRoomTemplate()
+
+        subjectColor:dict={}
+       
+        for val in data:
+            
+            row_A:int=0
+            row_B:int=0        
+            column_A:int=''
+            name=val['title'].upper()
+            start_time=val['start_time']
+            end_time=val['end_time']
+
+            for i, row in enumerate(self.sheet['A']):
+                if row.value==val['start_time']:
+                    row_A=i #1
+                if row.value==val['end_time']:
+                    row_B=i#2
+            for i, column in enumerate(self.sheet[3]):
+                if column.value==val['day']:
+                    column_A=i
+            cellDesc:str=f'{name}\n\n{start_time}-{end_time}'
+            # self.colorCell(column=columns[column_A],row=row_A+1, color=subjectColor[name])
+            self.colorCell(column=columns[column_A],row=row_A+1, color=self.roomColor[str(val['room'])])
             self.sheet.merge_cells(f'{columns[column_A]}{row_A+1}:{columns[column_A]}{row_B}')
             self.writeText(column=columns[column_A],row=row_A+1,text=cellDesc, fontType='class')
 
@@ -134,6 +145,8 @@ class TableGenerator:
         
         columns=['A','B','C','D','E','F','G','H','I','J','K']
         #resize cells and coloring:
+        for cell in (1,66):
+            self.sheet.row_dimensions[cell].height=20
         for col in range(len(columns)):
             self.colorCell(column=columns[col],row=3)
             if columns[col] == 'A':
@@ -160,7 +173,7 @@ class TableGenerator:
         self.base.saveXlsx()
 
 
-    def getEventTemplate(self):
+    def getRoomTemplate(self):
         columns=['A','B','C','D','E','F','G','H']
 
         
@@ -224,6 +237,8 @@ class TableGenerator:
         self.writeText(column='B', row=1, text=self.title,fontType='title')
 
     def setTimeColumn(self):
+        for cell in (6,67):
+            self.sheet.row_dimensions[cell].height=5
         data_time=[hour%24 for hour in range (self.workHours.startHour,self.workHours.endHour+1)]
         start_minute=self.workHours.startMinute
         minutes=[]
@@ -231,7 +246,7 @@ class TableGenerator:
             row=[]
             for minute in range ((60-start_minute)//self.step):
                 row.append(start_minute)
-                start_minute+=30
+                start_minute+=self.step
             minutes.append(row)
             start_minute=0
             if hour==self.workHours.endHour and start_minute==self.workHours.endMinute:

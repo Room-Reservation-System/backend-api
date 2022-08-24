@@ -13,9 +13,10 @@ urlpatterns = [
     path('instructors/', instructor_list),
     path('instructor/<int:id>', per_instructor),
 
-    path('mail/', sendMail),             
-    path('downloadcohort/<int:id>', xlsxGroupMode), #needs an id (class) as a arg
-    path('downloadnnchrt/<int:id>', xlsxForCohorts),
+    path('mail/', sendMail),            
+
+    path('downloadcohorts/<int:id>', xlsxForCohort),
+    path('downloadroom/<int:id>', xlsxForRoom),
     path('downloadfaculty/<int:id>', xlsxForFaculty),
     # path('qr/<int:id>',QRcodeGenerator)
 
