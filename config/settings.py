@@ -17,6 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 #templates and project directories
 EMAIL_TEMPLATE_DIR=os.path.join(BASE_DIR, 'email_templates')
 XLSXFILES_DIR=os.path.join(BASE_DIR,'xlsxFiles')
+FONTS_TTF=os.path.join(BASE_DIR,'fonts')
 
 
 # Quick-start development settings - unsuitable for production
@@ -64,7 +65,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [EMAIL_TEMPLATE_DIR,XLSXFILES_DIR],
+        'DIRS': [EMAIL_TEMPLATE_DIR,XLSXFILES_DIR,FONTS_TTF],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

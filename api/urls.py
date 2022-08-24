@@ -5,7 +5,7 @@ urlpatterns = [
   
     path('rooms/', room_list),
     path('events/<int:id>', event_list),
-    path('lectures/<int:id>', lecture_list), 
+    path('lectures/<int:id>', lecture_list),    
 
     path('cohorts/', cohort_list),
     path('cohort/<int:id>', per_cohort),
@@ -13,7 +13,13 @@ urlpatterns = [
     path('instructors/', instructor_list),
     path('instructor/<int:id>', per_instructor),
 
-    path('mail/', sendMail),             
-    path('download/<int:id>', downloadFile), 
+    path('mail/', sendMail),            
+
+    path('downloadcohorts/<int:id>', xlsxForCohort),
+    path('downloadroom/<int:id>', xlsxForRoom),
+    path('downloadfaculty/<int:id>', xlsxForFaculty),
+    # path('qr/<int:id>',QRcodeGenerator)
+
+
 ]
 

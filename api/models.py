@@ -3,7 +3,6 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.core.exceptions import ValidationError
 
 
-
 class Room (models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=150)
@@ -42,6 +41,7 @@ class Lecture (models.Model):
     start_time = models.TimeField(null=True)
     end_time = models.TimeField(null=True)
     room = models.ForeignKey('Room', on_delete=models.SET_NULL, null=True)
+    # major=Cohort
 
     WEEKDAYS = (
         ('1', 'Monday'),
@@ -67,7 +67,6 @@ class Lecture (models.Model):
         return self.title
     class Meta:
         ordering = ['day']
-
 
 
 class Meeting (models.Model):
