@@ -49,6 +49,9 @@ class Filter:
         filtered={'classes':self.converter(events=filteredList),
                   'instructor':instructor['name']}
         return filtered
+    def filterName(self,major:str,year:int)->str:
+        return f'{major}{year}'
+        
     def mergeData(self, dict1, dict2)->dict:
         newList=dict1['dataList']
         newList.extend(dict2['dataList'])

@@ -96,13 +96,27 @@ def xlsxForFaculty(request, id):
 
 @api_view(['GET'])
 def xlsxForCohort(request, id):
+    try:
+        lecturesForCohort = LectureSerializer(Lecture.objects.filter(cohort__id=id), many=True).data
+        nameForCohort = CohortSerializer(Cohort.objects.filter(id=id), many = True).data[0]
+    except Lecture.DoesNotExist or Cohort.DoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+    # return Response(lecturesForCohort)
+    filter=Filter()
+    table=TableGenerator(title=filter.filterName(major=nameForCohort['major'], year=nameForCohort['year']))
+    table.setDataRoomMode(data=filter.filterRoom(roomData=lecturesForCohort)['dataList'])
+    file=open(table.getFile(),'rb')
+    response=FileResponse(file)
+    return response
+
+@api_view(['GET'])
+def xlsxForCohorts(request, id):
     idCS=id
     idCM=id
     if id%2:
         idCS+=1
     else:
         idCM-=1
-        
     try:    
         lecturesForCS =  Lecture.objects.filter(cohort__id = idCS)
         lecturesForCM = Lecture.objects.filter(cohort__id = idCM)

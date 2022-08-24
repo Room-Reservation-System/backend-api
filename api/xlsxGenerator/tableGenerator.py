@@ -16,7 +16,7 @@ class Node():
 
 class TableGenerator:
     
-    def __init__(self,title:str,workHours:ScheduleTime=ScheduleTime(startHour=9, startMinute=0, endHour=24, endMinute=0),step:int=30,):
+    def __init__(self,title:str,workHours:ScheduleTime=ScheduleTime(startHour=9, startMinute=0, endHour=24, endMinute=0),step:int=15,):
 
         self.title=f'Timetable for {title}'
         self.workHours=workHours
@@ -75,7 +75,6 @@ class TableGenerator:
 
         self.base.saveXlsx()
 
-
     def setDataRoomMode(self,data):
         columns=['A','B','C','D','E','F','G','H']
       
@@ -90,7 +89,6 @@ class TableGenerator:
             name=val['title'].upper()
             start_time=val['start_time']
             end_time=val['end_time']
-          
 
             for i, row in enumerate(self.sheet['A']):
                 if row.value==val['start_time']:
@@ -101,21 +99,16 @@ class TableGenerator:
                 if column.value==val['day']:
                     column_A=i
             cellDesc:str=f'{name}\n\n{start_time}-{end_time}'
-            # self.colorCell(column=columns[column_A],row=row_A+1, color=subjectColor[name])
             self.colorCell(column=columns[column_A],row=row_A+1, color=self.roomColor[str(val['room'])])
             self.sheet.merge_cells(f'{columns[column_A]}{row_A+1}:{columns[column_A]}{row_B}')
             self.writeText(column=columns[column_A],row=row_A+1,text=cellDesc, fontType='class')
 
         self.base.saveXlsx()
 
-
     def setDataFaculty(self,data):
         columns=['A','B','C','D','E','F','G','H']
        
         self.getRoomTemplate()
-
-        subjectColor:dict={}
-       
         for val in data:
             
             row_A:int=0
@@ -134,7 +127,6 @@ class TableGenerator:
                 if column.value==val['day']:
                     column_A=i
             cellDesc:str=f'{name}\n\n{start_time}-{end_time}'
-            # self.colorCell(column=columns[column_A],row=row_A+1, color=subjectColor[name])
             self.colorCell(column=columns[column_A],row=row_A+1, color=self.roomColor[str(val['room'])])
             self.sheet.merge_cells(f'{columns[column_A]}{row_A+1}:{columns[column_A]}{row_B}')
             self.writeText(column=columns[column_A],row=row_A+1,text=cellDesc, fontType='class')
@@ -146,7 +138,7 @@ class TableGenerator:
         columns=['A','B','C','D','E','F','G','H','I','J','K']
         #resize cells and coloring:
         for cell in (1,66):
-            self.sheet.row_dimensions[cell].height=20
+            self.sheet.row_dimensions[cell].height=10
         for col in range(len(columns)):
             self.colorCell(column=columns[col],row=3)
             if columns[col] == 'A':
@@ -171,7 +163,6 @@ class TableGenerator:
         self.writeText(column='A',row=3,text='Dutaion')
       
         self.base.saveXlsx()
-
 
     def getRoomTemplate(self):
         columns=['A','B','C','D','E','F','G','H']
