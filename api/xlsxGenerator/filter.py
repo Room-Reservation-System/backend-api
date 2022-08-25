@@ -21,7 +21,9 @@ class Filter:
         filtered=self.converter(events=filtered)
         return filtered
 
+
     def filterHeader(self, header:dict, groupMode=False)->str:
+
         if type(header) is int or type(header) is str:
             return f'{header}'
         year=header['year']
@@ -35,7 +37,9 @@ class Filter:
         else:
             name=header['major']
         return f'{name}-{year}'
+
     def filterInstractor(self,classes, instructor)->dict:
+
         filteredList:list=[]
         for event in classes:
             locDict:dict={}

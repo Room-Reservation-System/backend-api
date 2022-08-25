@@ -1,5 +1,7 @@
 from datetime import date, timedelta
 from rest_framework.response import Response
+
+
 from .serializers import *
 from .models import *
 from rest_framework.decorators import api_view
@@ -12,7 +14,7 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from .xlsxGenerator.tableGenerator import TableGenerator
 from .xlsxGenerator.filter import Filter
-from .QRcodeGenerator.qrcodeGenerator import QRcode
+from .QRcodeGenerator.QRcodeGenerator import QRcode
 import hashlib
 
 
