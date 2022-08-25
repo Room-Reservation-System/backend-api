@@ -23,7 +23,7 @@ class Filter:
         return TypeXlsx(dataList=filtered)
 
     def filterHeader(self, header:dict, groupMode=False)\
-        ->dict[Literal['major']:str|Literal['year']:int]:
+        ->dict[Literal['major']:str,Literal['year']:int]:
         if type(header) is int or type(header) is str:
             return f'{header}'
         year=header['year']
@@ -38,7 +38,7 @@ class Filter:
             name=header['major']
         return f'{name}-{year}'
     def filterInstractor(self,classes, instructor)\
-        ->dict[Literal['classes']:List[dict]|Literal['instructor']:str]:
+        ->dict[Literal['classes']:List[dict],Literal['instructor']:str]:
         filteredList:list=[]
         for event in classes:
             locDict:dict={}

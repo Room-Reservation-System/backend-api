@@ -137,8 +137,8 @@ class TableGenerator:
         
         columns=['A','B','C','D','E','F','G','H','I','J','K']
         #resize cells and coloring:
-        for cell in (1,66):
-            self.sheet.row_dimensions[cell].height=10
+        # for cell in (1,66):
+        #     self.sheet.row_dimensions[cell].height=10
         for col in range(len(columns)):
             self.colorCell(column=columns[col],row=3)
             if columns[col] == 'A':
