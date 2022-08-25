@@ -1,10 +1,6 @@
-import qrcode
-from qrcode.image.styledpil import StyledPilImage
-from qrcode.image.styles.colormasks import RadialGradiantColorMask
 from django.conf import settings
 from os import path, mkdir, remove
 from .objectsType import QRcodeType 
-from PIL import ImageFont, ImageDraw, Image
 
 class QRcode:
 	def __init__(self,dirPath=None):
