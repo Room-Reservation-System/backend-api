@@ -19,7 +19,7 @@ urlpatterns = [
     path('downloadcohort/<int:id>', xlsxForCohort),
     path('downloadroom/<int:id>', xlsxForRoom),
     path('downloadfaculty/<int:id>', xlsxForFaculty),
-    # path('qr/<int:id>',QRcodeGenerator)
+    path('qr/',getQRcode),
 
 
 ]

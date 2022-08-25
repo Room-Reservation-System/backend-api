@@ -12,51 +12,19 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from .xlsxGenerator.tableGenerator import TableGenerator
 from .xlsxGenerator.filter import Filter
+from .QRcodeGenerator.qrcodeGenerator import QRcode
 import hashlib
 
 
-# @api_view(['GET'])
-# def QRcodeGenerator(request, id):
+@api_view(['GET'])
+def getQRcode(request):
     
-#     if request.method=='GET':
-
-#         if id == 0:
-#             meetings = Meeting.objects.all()
-#             serializer = MeetingSerializer(meetings, many = True)
-#             return Response(serializer.data)
-
-#         try:    
-#             meetings =  Meeting.objects.filter(Q(room__id = id) & Q(type__exact = ('class')))
-            
-#         except Meeting.DoesNotExist:
-#             return Response(status = status.HTTP_404_NOT_FOUND)
-
-#         serializer = MeetingSerializer(meetings, many = True)
-        
-
-#         link='https://www.youtube.com/watch?v=tXsQJhoauxc'
-#         name='demo'
-#         QRcodeGenerator().getQRcode(fileName=f'{name}{id}',siteLink=link)
-#         # table.setData()
-#         # file=open(table.getFile(),'rb')
-#         response=FileResponse(QRcodeGenerator().getQRcode(fileName=name,siteLink=link))
-
-# @api_view(['GET'])
-# def xlsxForCohorts(request, id):
-    
-#     try:    
-#         lectures =  Lecture.objects.filter(cohort__id = id)
-#         cohorts = Cohort.objects.filter(id=id)
-#     except Lecture.DoesNotExist or Cohort.DoesNotExist:
-#         return Response(status = status.HTTP_404_NOT_FOUND)
-#     lectureData = LectureSerializer(lectures, many = True)
-#     cohortData=CohortSerializer(cohorts, many = True)
-
-#     mainData=Filter().filter(events=lectureData.data,header=cohortData.data)
-#     table=TableGenerator(data=mainData).setDataClassMode()
-#     file=open(table.getFile(),'rb')
-#     response=FileResponse(file)
-#     return response
+    # return Response('hello')
+    url='https://www.youtube.com/watch?v=tXsQJhoauxc'
+    name='demo'
+    # QRCode=
+    QRcode().getQRcode(fileName=name,url=url)
+    return Response(['generated'])
 
 @api_view(['GET'])
 def xlsxForRoom(request, id):
@@ -93,7 +61,6 @@ def xlsxForFaculty(request, id):
     response=FileResponse(file)
     return response
 
-
 @api_view(['GET'])
 def xlsxForCohort(request, id):
     try:
@@ -101,7 +68,6 @@ def xlsxForCohort(request, id):
         nameForCohort = CohortSerializer(Cohort.objects.filter(id=id), many = True).data[0]
     except Lecture.DoesNotExist or Cohort.DoesNotExist:
         return Response(status = status.HTTP_404_NOT_FOUND)
-    # return Response(lecturesForCohort)
     filter=Filter()
     table=TableGenerator(title=filter.filterName(major=nameForCohort['major'], year=nameForCohort['year']))
     table.setDataRoomMode(data=filter.filterRoom(roomData=lecturesForCohort)['dataList'])

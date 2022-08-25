@@ -1,8 +1,10 @@
-from typing import List, NamedTuple
+from typing import NamedTuple
 
 
 class QRcodeType(NamedTuple):
-    link:str
+    webSiteUrl:str
     description:str | None
+    use: str | None
+
     
     
