@@ -173,9 +173,9 @@ cython_debug/
 
 # End of https://www.toptal.com/developers/gitignore/api/django
 sendgrid.env
-**.xlsx
 
 # persnonal settings:
-
+**.xlsx
+**.jpg
 .vscode/
 =======
