@@ -18,7 +18,7 @@ class QRcode:
 			mkdir(self.dirPath)
 	
 	def getQRcode(self,fileName:str,url:str,aboutQR:QRcodeType\
-		=QRcodeType(description='Hello I am QRcode',webSiteUrl='http://mysite.com',use='Scan me!'), image=True, size=(2280,2480)):
+		=QRcodeType(description='Hello I am QRcode',webSiteUrl='http://mysite.com',use='Scan me!'), image=True, size=(1120,1240)):
 		qrCode=self.generateQRcode(url=url, image=image, size=size)
 		self.dirConfig()
 		try:

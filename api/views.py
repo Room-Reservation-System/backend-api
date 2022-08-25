@@ -17,14 +17,13 @@ import hashlib
 
 
 @api_view(['GET'])
-def getQRcode(request):
+def getQRcode(request, id):
+    url=os.path.join('https://room-schedule.vercel.app/schedule/',str(id))
     
-    # return Response('hello')
-    url='https://www.youtube.com/watch?v=tXsQJhoauxc'
-    name='demo'
-    # QRCode=
-    QRcode().getQRcode(fileName=name,url=url)
-    return Response(['generated'])
+    print(url)
+    file=open(QRcode().getQRcode(fileName='qrcode',url=url),'rb')
+    response=FileResponse(file)
+    return response
 
 @api_view(['GET'])
 def xlsxForRoom(request, id):
@@ -38,7 +37,7 @@ def xlsxForRoom(request, id):
     headerData=Filter().filterHeader(header=id)
     # return Response(headerData)
     table=TableGenerator(title=headerData)
-    table.setDataRoomMode(data=roomData['dataList'])
+    table.setDataRoomMode(data=roomData)
     file=open(table.getFile(),'rb')
     response=FileResponse(file)
     return response
@@ -70,7 +69,7 @@ def xlsxForCohort(request, id):
         return Response(status = status.HTTP_404_NOT_FOUND)
     filter=Filter()
     table=TableGenerator(title=filter.filterName(major=nameForCohort['major'], year=nameForCohort['year']))
-    table.setDataRoomMode(data=filter.filterRoom(roomData=lecturesForCohort)['dataList'])
+    table.setDataRoomMode(data=filter.filterRoom(roomData=lecturesForCohort))
     file=open(table.getFile(),'rb')
     response=FileResponse(file)
     return response
@@ -103,7 +102,7 @@ def xlsxForCohorts(request, id):
     mergedData=filter.mergeData(dict1=dataCM,dict2=dataCS)
     title=filter.mergeHeader(dict1=headerCS,dict2=headerCM)
     table=TableGenerator(title=title,step=15)
-    table.setDataCohortMode(data=mergedData,)
+    table.setDataCohortMode(data=mergedData)
     file=open(table.getFile(),'rb')
     # return Response(mergedData)
     response=FileResponse(file)
