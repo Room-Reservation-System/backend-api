@@ -69,7 +69,10 @@ class TableGenerator:
                         columnCS+=1
 
             cellDesc:str=f'{name}\n\n{start_time}-{end_time}\nroom:{room}'
-            self.colorCell(column=columns[columnCS],row=row_A+1, color=self.roomColor[str(val['room'])])
+            try: 
+                self.colorCell(column=columns[columnCS],row=row_A+1, color=self.roomColor[str(val['room'])])
+            except:
+                self.colorCell(column=columns[columnCS],row=row_A+1, color=self.roomColor["202"])
             self.sheet.merge_cells(f'{columns[columnCS]}{row_A+1}:{columns[columnCS]}{row_B}')
             self.writeText(column=columns[columnCS],row=row_A+1,text=cellDesc, fontType='class')
 
@@ -99,7 +102,11 @@ class TableGenerator:
                 if column.value==val['day']:
                     column_A=i
             cellDesc:str=f'{name}\n\n{start_time}-{end_time}'
-            self.colorCell(column=columns[column_A],row=row_A+1, color=self.roomColor[str(val['room'])])
+            
+            try: 
+                self.colorCell(column=columns[column_A],row=row_A+1, color=self.roomColor[str(val['room'])])
+            except:
+                self.colorCell(column=columns[column_A],row=row_A+1, color=self.roomColor["202"])
             self.sheet.merge_cells(f'{columns[column_A]}{row_A+1}:{columns[column_A]}{row_B}')
             self.writeText(column=columns[column_A],row=row_A+1,text=cellDesc, fontType='class')
 
@@ -127,7 +134,10 @@ class TableGenerator:
                 if column.value==val['day']:
                     column_A=i
             cellDesc:str=f'{name}\n\n{start_time}-{end_time}'
-            self.colorCell(column=columns[column_A],row=row_A+1, color=self.roomColor[str(val['room'])])
+            try: 
+                self.colorCell(column=columns[column_A],row=row_A+1, color=self.roomColor[str(val['room'])])
+            except:
+                self.colorCell(column=columns[column_A],row=row_A+1, color=self.roomColor["202"])
             self.sheet.merge_cells(f'{columns[column_A]}{row_A+1}:{columns[column_A]}{row_B}')
             self.writeText(column=columns[column_A],row=row_A+1,text=cellDesc, fontType='class')
 
