@@ -56,6 +56,7 @@ class TableGenerator:
             start_time=val['start_time']
             end_time=val['end_time']
             room=val['room']
+            instructor=val['instructor']
 
             for i, row in enumerate(self.sheet['A']):
                 if row.value==val['start_time']:
@@ -68,12 +69,13 @@ class TableGenerator:
                     if val['group']=='CS':
                         columnCS+=1
 
-            cellDesc:str=f'{name}\n\n{start_time}-{end_time}\nroom:{room}'
+            cellDesc:str=f'{name}\n\n{instructor}\n\n{room}\n{start_time}-{end_time}'
             self.colorCell(column=columns[columnCS],row=row_A+1, color=self.roomColor[str(val['room'])])
             self.sheet.merge_cells(f'{columns[columnCS]}{row_A+1}:{columns[columnCS]}{row_B}')
             self.writeText(column=columns[columnCS],row=row_A+1,text=cellDesc, fontType='class')
 
         self.base.saveXlsx()
+
 
     def setDataRoomMode(self,data):
         columns=['A','B','C','D','E','F','G','H']
@@ -86,6 +88,7 @@ class TableGenerator:
             row_A:int=0
             row_B:int=0        
             column_A:int=''
+            instructor=val['instructor']
             name=val['title'].upper()
             start_time=val['start_time']
             end_time=val['end_time']
@@ -98,7 +101,7 @@ class TableGenerator:
             for i, column in enumerate(self.sheet[3]):
                 if column.value==val['day']:
                     column_A=i
-            cellDesc:str=f'{name}\n\n{start_time}-{end_time}'
+            cellDesc:str=f'{name}\n\n{instructor}\n\n{start_time}-{end_time}'
             self.colorCell(column=columns[column_A],row=row_A+1, color=self.roomColor[str(val['room'])])
             self.sheet.merge_cells(f'{columns[column_A]}{row_A+1}:{columns[column_A]}{row_B}')
             self.writeText(column=columns[column_A],row=row_A+1,text=cellDesc, fontType='class')

@@ -1,13 +1,11 @@
 from datetime import datetime
-from hashlib import new
 from .objectsType import TypeXlsx
 from typing import Literal, List
 
 class Filter:
     
-    def __init__(self,targets:list=['title','start_time','end_time','day','room']):
+    def __init__(self,targets:list=['title','start_time','end_time','day','room','instructor']):
         self.targets=targets
-
     def filterRoom(self,roomData:List[dict],group=None)->list:
         filtered:list=[]
         for event in roomData:
@@ -37,8 +35,21 @@ class Filter:
         else:
             name=header['major']
         return f'{name}-{year}'
-
-    def filterInstractor(self,classes, instructor)->dict:
+    def filterClassInstractors(self,classes:list, instructors:list):
+        filetedInstractors={}
+        for dicts in instructors:
+            for items in dicts:
+                filetedInstractors[dicts['id']]=dicts['name']
+                
+        for dicts in classes:
+            for key, val in dicts.items():
+                if key == 'instructor':
+                    dicts['instructor']=filetedInstractors[val]
+        for item in classes:
+            for key, val in item.items():
+                print(f'{key}:{val}')
+        return classes
+    def filterInstractor(self,classes:list, instructor:dict,)->dict:
 
         filteredList:list=[]
         for event in classes:
