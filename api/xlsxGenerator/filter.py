@@ -45,9 +45,6 @@ class Filter:
             for key, val in dicts.items():
                 if key == 'instructor':
                     dicts['instructor']=filetedInstractors[val]
-        for item in classes:
-            for key, val in item.items():
-                print(f'{key}:{val}')
         return classes
     def filterInstractor(self,classes:list, instructor:dict,)->dict:
 

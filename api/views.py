@@ -16,14 +16,30 @@ from .xlsxGenerator.tableGenerator import TableGenerator
 from .xlsxGenerator.filter import Filter
 from .QRcodeGenerator.QRcodeGenerator import QRcode
 import hashlib
+import qrcode
+from django.conf import settings
 
 
 @api_view(['GET'])
 def getQRcode(request, id):
-    url=os.path.join('https://room-schedule.vercel.app/schedule/',str(id))
+    url=os.path.join('https://www.room-schedule.vercel.app/schedule/',(str(id)+"/"))
+
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(url)
+    qr.make(fit=True)
+    img = qr.make_image()
+    filePath=os.path.join(settings.BASE_DIR,'QRCodePic','qrcode.png')
+    img.save(filePath)
+
+    # url=os.path.join('https://www.room-schedule.vercel.app/schedule/',(str(id)+"/"))
     
-    print(url)
-    file=open(QRcode().getQRcode(fileName='qrcode',url=url),'rb')
+    # print(url)
+    file=open(filePath,'rb')
     response=FileResponse(file)
     return response
 

@@ -33,12 +33,12 @@ class TableGenerator:
                         '206':'CC99FF',
                         '209':'FFFF00',
                         '109':'F8CBAD',
-                        '111':'FFC000',
+                        '111':'F4B084',
                         'B14':'9BC2E6',
-                        '3.28':'D9E1F2',
-                        'CreativeRoom':'00FFFF',
+                        '3.28':'D6DCE4',
+                        'B14':'8EA9DB',
+                        '11':'00FFFF',
                         '69':'FFFFFF'}
-        self.setBaseTemplate()
         self.setTimeColumn()
 
     def setDataCohortMode(self,data,group:Group=Group(groupOne='Cohort One: Arts',groupTwo='Cohort Two: Sciences')):
@@ -46,6 +46,7 @@ class TableGenerator:
         
         columns=['A','B','C','D','E','F','G','H','I','J','K']
         # cohort={'Arts':}
+        self.setBaseTemplate(start='B',end=columns[-1])
         self.getCohortTemplate(group=group)
         for val in data:
             
@@ -70,6 +71,7 @@ class TableGenerator:
                         columnCS+=1
 
             cellDesc:str=f'{name}\n\n{instructor}\n\n{room}\n{start_time}-{end_time}'
+            self.borderSet(column=columnCS+1, startRow=row_A+1, endRow=row_B)
             try: 
                 self.colorCell(column=columns[columnCS],row=row_A+1, color=self.roomColor[str(val['room'])])
             except:
@@ -79,11 +81,10 @@ class TableGenerator:
 
         self.base.saveXlsx()
 
-
     def setDataRoomMode(self,data):
         columns=['A','B','C','D','E','F','G','H']
       
-
+        self.setBaseTemplate(start='B',end=columns[-1])
         self.getRoomTemplate()
 
         for val in data:
@@ -105,7 +106,7 @@ class TableGenerator:
                 if column.value==val['day']:
                     column_A=i
             cellDesc:str=f'{name}\n\n{instructor}\n\n{start_time}-{end_time}'
-            
+            self.borderSet(column=column_A+1, startRow=row_A+1, endRow=row_B)
             try: 
                 self.colorCell(column=columns[column_A],row=row_A+1, color=self.roomColor[str(val['room'])])
             except:
@@ -117,7 +118,7 @@ class TableGenerator:
 
     def setDataFaculty(self,data):
         columns=['A','B','C','D','E','F','G','H']
-       
+        self.setBaseTemplate(start='B',end=columns[-1])
         self.getRoomTemplate()
         for val in data:
             
@@ -137,6 +138,7 @@ class TableGenerator:
                 if column.value==val['day']:
                     column_A=i
             cellDesc:str=f'{name}\n\n{start_time}-{end_time}'
+            self.borderSet(column=column_A+1, startRow=row_A+1, endRow=row_B)
             try: 
                 self.colorCell(column=columns[column_A],row=row_A+1, color=self.roomColor[str(val['room'])])
             except:
@@ -216,7 +218,14 @@ class TableGenerator:
         self.sheet[f'{column}{row}']=text
         self.textLocation(column=column,row=row,wrap_text=wrapText)
         self.fontText(column=column,row=row,fontType=fontType)
-    
+
+    def borderSet(self, column:int, startRow:int, endRow:int):
+        # print(f'{column}{startRow}:{column}{endRow}')
+        locBorder=Side(border_style='medium')
+        for row in self.sheet.iter_rows(min_row=startRow,min_col=column,max_row=endRow,max_col=column):
+            for cell in row:
+                cell.border=Border(left=locBorder,right=locBorder,bottom=locBorder,top=locBorder)
+
     def getFile(self):
         return path.join(self.dirName, self.fileName)
     
@@ -233,12 +242,13 @@ class TableGenerator:
         Node.used=0
         Node.next_index=0
 
-    def setBaseTemplate(self):
-        self.sheet.merge_cells('B1:H1')
+    def setBaseTemplate(self,start:str,end:str):
+        self.sheet.merge_cells(f'{start}1:{end}1')
         self.sheet.row_dimensions[1].height=25
         self.colorCell(column='B',row=1,color='E0E0E0')
         self.colorCell(column='A',row=1,color='E0E0E0')
         self.writeText(column='B', row=1, text=self.title,fontType='title')
+
 
     def setTimeColumn(self):
         for cell in (6,67):
