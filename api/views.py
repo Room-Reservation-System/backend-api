@@ -16,29 +16,55 @@ from .xlsxGenerator.tableGenerator import TableGenerator
 from .xlsxGenerator.filter import Filter
 from .QRcodeGenerator.QRcodeGenerator import QRcode
 import hashlib
+import qrcode
+from django.conf import settings
 
 
 @api_view(['GET'])
 def getQRcode(request, id):
-    url=os.path.join('https://room-schedule.vercel.app/schedule/',str(id))
+    url=os.path.join('https://www.room-schedule.vercel.app/schedule/',(str(id)+"/"))
+
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(url)
+    qr.make(fit=True)
+    img = qr.make_image()
+    filePath=os.path.join(settings.BASE_DIR,'QRCodePic','qrcode.png')
+    img.save(filePath)
+
+    # url=os.path.join('https://www.room-schedule.vercel.app/schedule/',(str(id)+"/"))
     
-    print(url)
-    file=open(QRcode().getQRcode(fileName='qrcode',url=url),'rb')
+    # print(url)
+    file=open(filePath,'rb')
     response=FileResponse(file)
     return response
+
+@api_view(['GET'])
+def check(request,id):
+    lectures = LectureSerializer(Lecture.objects.filter(cohort__id=id), many = True).data
+
+    filter=Filter()
+    data=filter.filterClassInstractors(classes=lectures,instructors=InstructorSerializer(Instructor.objects.all(), many = True).data)
+    return Response(data)
 
 @api_view(['GET'])
 def xlsxForRoom(request, id):
     
     try:    
         lectures =  Lecture.objects.filter(room__id = id)
+        instructors = Instructor.objects.all()
     except Lecture.DoesNotExist:
         return Response(status = status.HTTP_404_NOT_FOUND)
     lectureData = LectureSerializer(lectures, many = True).data
-    roomData=Filter().filterRoom(roomData=lectureData)
-    headerData=Filter().filterHeader(header=id)
-    # return Response(headerData)
-    table=TableGenerator(title=headerData)
+    instructors=InstructorSerializer(Instructor.objects.all(), many = True).data
+    filter=Filter()
+    roomData=filter.filterClassInstractors(classes=filter.filterRoom(roomData=lectureData), instructors=instructors)
+    headerData=filter.filterHeader(header=id)
+    table=TableGenerator(title=headerData )
     table.setDataRoomMode(data=roomData)
     file=open(table.getFile(),'rb')
     response=FileResponse(file)
@@ -76,32 +102,40 @@ def xlsxForCohort(request, id):
     response=FileResponse(file)
     return response
 
+
 @api_view(['GET'])
 def xlsxForCohorts(request, id):
     idCS=id
     idCM=id
     if id%2:
-        idCS+=1
-    else:
         idCM-=1
+    else:
+        idCS+=1
     try:    
         lecturesForCS =  Lecture.objects.filter(cohort__id = idCS)
         lecturesForCM = Lecture.objects.filter(cohort__id = idCM)
         cohortCS = Cohort.objects.filter(id=idCS)
         cohortCM = Cohort.objects.filter(id=idCM)
-
+    
     except Lecture.DoesNotExist or Cohort.DoesNotExist:
         return Response(status = status.HTTP_404_NOT_FOUND)
+
     filter=Filter()
+
+        
     groupCS = LectureSerializer(lecturesForCS, many = True).data
     headerCS = CohortSerializer(cohortCS, many = True).data[0]
     dataCS=filter.filterRoom(roomData=groupCS,group=headerCS['major'])
+    # return Response([{'CS':idCS,'CM':idCM}])
 
     groupCM = LectureSerializer(lecturesForCM, many = True).data
     headerCM = CohortSerializer(cohortCM, many = True).data[0]
     dataCM=filter.filterRoom(roomData=groupCM,group=headerCM['major'])
 
+    instructors=InstructorSerializer(Instructor.objects.all(), many = True).data
+
     mergedData=filter.mergeData(dict1=dataCM,dict2=dataCS)
+    mergedData=filter.filterClassInstractors(classes=mergedData, instructors=instructors)
     title=filter.mergeHeader(dict1=headerCS,dict2=headerCM)
     table=TableGenerator(title=title,step=15)
     table.setDataCohortMode(data=mergedData)
