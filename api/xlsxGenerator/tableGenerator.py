@@ -15,7 +15,7 @@ class Node():
 
 
 class TableGenerator:
-    
+
     def __init__(self,title:str,workHours:ScheduleTime=ScheduleTime(startHour=9, startMinute=0, endHour=24, endMinute=0),step:int=15,):
 
         self.title=f'Timetable for {title}'
@@ -43,21 +43,19 @@ class TableGenerator:
 
     def setDataCohortMode(self,data,group:Group=Group(groupOne='Cohort One: Arts',groupTwo='Cohort Two: Sciences')):
         groupOne,groupTwo=group
-        
+
         columns=['A','B','C','D','E','F','G','H','I','J','K']
-        # cohort={'Arts':}
         self.setBaseTemplate(start='B',end=columns[-1])
         self.getCohortTemplate(group=group)
         for val in data:
-            
+
             row_A:int=0
-            row_B:int=0        
+            row_B:int=0
             columnCS:int=0
             name=val['title'].upper()
             start_time=val['start_time']
             end_time=val['end_time']
             room=val['room']
-            instructor=val['instructor']
 
             for i, row in enumerate(self.sheet['A']):
                 if row.value==val['start_time']:
@@ -70,9 +68,9 @@ class TableGenerator:
                     if val['group']=='CS':
                         columnCS+=1
 
-            cellDesc:str=f'{name}\n\n{instructor}\n\n{room}\n{start_time}-{end_time}'
+            cellDesc:str=f'{name}\n\n{start_time}-{end_time}\nroom:{room}'
             self.borderSet(column=columnCS+1, startRow=row_A+1, endRow=row_B)
-            try: 
+            try:
                 self.colorCell(column=columns[columnCS],row=row_A+1, color=self.roomColor[str(val['room'])])
             except:
                 self.colorCell(column=columns[columnCS],row=row_A+1, color=self.roomColor["202"])
@@ -83,14 +81,14 @@ class TableGenerator:
 
     def setDataRoomMode(self,data):
         columns=['A','B','C','D','E','F','G','H']
-      
+
         self.setBaseTemplate(start='B',end=columns[-1])
         self.getRoomTemplate()
 
         for val in data:
-            
+
             row_A:int=0
-            row_B:int=0        
+            row_B:int=0
             column_A:int=''
             instructor=val['instructor']
             name=val['title'].upper()
@@ -105,9 +103,10 @@ class TableGenerator:
             for i, column in enumerate(self.sheet[3]):
                 if column.value==val['day']:
                     column_A=i
-            cellDesc:str=f'{name}\n\n{instructor}\n\n{start_time}-{end_time}'
+            cellDesc:str=f'{name}\n\n{start_time}-{end_time}'
             self.borderSet(column=column_A+1, startRow=row_A+1, endRow=row_B)
-            try: 
+
+            try:
                 self.colorCell(column=columns[column_A],row=row_A+1, color=self.roomColor[str(val['room'])])
             except:
                 self.colorCell(column=columns[column_A],row=row_A+1, color=self.roomColor["202"])
@@ -118,12 +117,13 @@ class TableGenerator:
 
     def setDataFaculty(self,data):
         columns=['A','B','C','D','E','F','G','H']
+
         self.setBaseTemplate(start='B',end=columns[-1])
         self.getRoomTemplate()
         for val in data:
-            
+
             row_A:int=0
-            row_B:int=0        
+            row_B:int=0
             column_A:int=''
             name=val['title'].upper()
             start_time=val['start_time']
@@ -139,7 +139,7 @@ class TableGenerator:
                     column_A=i
             cellDesc:str=f'{name}\n\n{start_time}-{end_time}'
             self.borderSet(column=column_A+1, startRow=row_A+1, endRow=row_B)
-            try: 
+            try:
                 self.colorCell(column=columns[column_A],row=row_A+1, color=self.roomColor[str(val['room'])])
             except:
                 self.colorCell(column=columns[column_A],row=row_A+1, color=self.roomColor["202"])
@@ -147,9 +147,9 @@ class TableGenerator:
             self.writeText(column=columns[column_A],row=row_A+1,text=cellDesc, fontType='class')
 
         self.base.saveXlsx()
-        
+
     def getCohortTemplate(self,group:Group):
-        
+
         columns=['A','B','C','D','E','F','G','H','I','J','K']
         #resize cells and coloring:
         # for cell in (1,66):
@@ -176,13 +176,13 @@ class TableGenerator:
         # duration
         self.sheet.merge_cells('A3:A4')
         self.writeText(column='A',row=3,text='Dutaion')
-      
+
         self.base.saveXlsx()
 
     def getRoomTemplate(self):
         columns=['A','B','C','D','E','F','G','H']
 
-        
+
         for i, cell in enumerate(columns):
             self.sheet.merge_cells(f'{columns[i]}3:{columns[i]}4')
             self.colorCell(column=columns[i],row=3)
@@ -192,7 +192,7 @@ class TableGenerator:
             else:
                 self.sheet.column_dimensions[cell].width=35
                 self.writeText(column=cell, row=3, text=self.week_list[i-1],fontType='general')
-      
+
     def textLocation(self,column:str,row:int,wrap_text=True):
         self.sheet[f'{column}{row}'].alignment=Alignment(horizontal='center',vertical='center',wrap_text=wrap_text)
 
@@ -209,7 +209,7 @@ class TableGenerator:
         if color is None:
             color='E0E0E0'
         self.sheet[f'{column}{row}'].fill=PatternFill(fill_type='solid',start_color=color,end_color=color, )
-    
+
     def borderStyle(self,column:str,row:int,borderType:str):
         locBorder=Side(border_style=borderType)
         self.sheet[f'{column}{row}'].border=Border(left=locBorder,right=locBorder,bottom=locBorder,top=locBorder)
@@ -220,7 +220,6 @@ class TableGenerator:
         self.fontText(column=column,row=row,fontType=fontType)
 
     def borderSet(self, column:int, startRow:int, endRow:int):
-        # print(f'{column}{startRow}:{column}{endRow}')
         locBorder=Side(border_style='medium')
         for row in self.sheet.iter_rows(min_row=startRow,min_col=column,max_row=endRow,max_col=column):
             for cell in row:
@@ -228,7 +227,7 @@ class TableGenerator:
 
     def getFile(self):
         return path.join(self.dirName, self.fileName)
-    
+
     def getDir(self):
         return self.dirName
 
@@ -248,7 +247,6 @@ class TableGenerator:
         self.colorCell(column='B',row=1,color='E0E0E0')
         self.colorCell(column='A',row=1,color='E0E0E0')
         self.writeText(column='B', row=1, text=self.title,fontType='title')
-
 
     def setTimeColumn(self):
         for cell in (6,67):
@@ -271,11 +269,11 @@ class TableGenerator:
                 row=self.getIndex(initial_index=6)
                 time_var:str=f'{value}:{minute}'
                 if time_var[-2:]==':0':time_var+='0'
-                
+
                 if self.workHours.endHour%24==value and self.workHours.endMinute<minute:
                     m=f'{self.workHours.endMinute}'
                     if m=='0':m+='0'
-                    break 
+                    break
                 self.writeText(column='A', row=row, text=time_var,fontType='general')
                 self.colorCell(column='A', row=row)
                 self.sheet.row_dimensions[row].height=30
