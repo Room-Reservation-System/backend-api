@@ -16,48 +16,33 @@ class QRcode:
 	def dirConfig(self):
 		if not path.exists(self.dirPath):
 			mkdir(self.dirPath)
-	def simpleDimple(self,fileName:str,url:str):
-		qr = qrcode.QRCode(
-			version=1,
-			error_correction=qrcode.constants.ERROR_CORRECT_L,
-			box_size=10,
-			border=4,
-		)
-		qr.add_data(url)
-		qr.make(fit=True)
-		img = qr.make_image()
-		img.save(path.join(self.dirPath,f'{fileName}.png'))
-		return path.join(self.dirPath, f'{fileName}.png')
-
+	
 	def getQRcode(self,fileName:str,url:str,aboutQR:QRcodeType\
 		=QRcodeType(description='Hello I am QRcode',webSiteUrl='http://mysite.com',use='Scan me!'), image=True, size=(1120,1240)):
 		qrCode=self.generateQRcode(url=url, image=image, size=size)
 		self.dirConfig()
 		try:
-			qrCode.save(path.join(self.dirPath,f'{fileName}.png'))
+			qrCode.save(path.join(self.dirPath,f'{fileName}.jpg'))
 
 		except FileExistsError:
-			remove(path.join(self.dirPath,f'{fileName}.png'))
-			qrCode.save(path.join(self.dirPath,f'{fileName}.png'))
+			remove(path.join(self.dirPath,f'{fileName}.jpg'))
+			qrCode.save(path.join(self.dirPath,f'{fileName}.jpg'))
 		
-		return path.join(self.dirPath, f'{fileName}.png')
+		return path.join(self.dirPath, f'{fileName}.jpg')
     
 	@staticmethod
 	def generateQRcode(url:str,image=False, size =(2280,2480)):
-		# if not url.endswith('qrcode=true'):
-		# 	url=f'{url}&qrcode=true'
-		# return qrcode.make(url)
 		qrCode=qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_M,version=1,box_size=42, border=4)
 		qrCode.add_data(url)
 		qrCode=qrCode.make_image(image_factory=StyledPilImage, color_masks=RadialGradiantColorMask,)
 		return qrCode
-		# if image:
-		# 	qrCodeBase=Base.createBase(size=size)
-		# 	posQRcode=(qrCodeBase.size[0]//2-qrCode.size[0]//2,qrCodeBase.size[1]//2-qrCode.size[1]//2-130)
-		# 	qrCodeBase.paste(qrCode,posQRcode)
-		# 	return qrCodeBase
-		# else: 
-		# 	return qrCode
+		if image:
+			qrCodeBase=Base.createBase(size=size)
+			posQRcode=(qrCodeBase.size[0]//2-qrCode.size[0]//2,qrCodeBase.size[1]//2-qrCode.size[1]//2-130)
+			qrCodeBase.paste(qrCode,posQRcode)
+			return qrCodeBase
+		else: 
+			return qrCode
 
 
 	@staticmethod
