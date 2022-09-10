@@ -3,7 +3,7 @@ from .objectsType import TypeXlsx
 from typing import Literal, List
 
 class Filter:
-    
+
     def __init__(self,targets:list=['title','start_time','end_time','day','room','instructor']):
         self.targets=targets
     def filterRoom(self,roomData:List[dict],group=None)->list:
@@ -35,17 +35,8 @@ class Filter:
         else:
             name=header['major']
         return f'{name}-{year}'
-    def filterClassInstractors(self,classes:list, instructors:list):
-        filetedInstractors={}
-        for dicts in instructors:
-            for items in dicts:
-                filetedInstractors[dicts['id']]=dicts['name']
-                
-        for dicts in classes:
-            for key, val in dicts.items():
-                if key == 'instructor':
-                    dicts['instructor']=filetedInstractors[val]
-        return classes
+
+
     def filterInstractor(self,classes:list, instructor:dict,)->dict:
 
         filteredList:list=[]
@@ -59,9 +50,22 @@ class Filter:
                   'instructor':instructor['name']}
         return filtered
 
+    def filterClassInstractors(self,classes:list, instructors:list):
+        filetedInstractors={}
+        for dicts in instructors:
+            for items in dicts:
+                filetedInstractors[dicts['id']]=dicts['name']
+        print(classes)
+        for dicts in classes:
+            for key, val in dicts.items():
+                if key == 'instructor':
+                    dicts['instructor']=filetedInstractors[int(val)]
+        return classes
+
+
     def filterName(self,major:str,year:int)->str:
         return f'{major}{year}'
-        
+
     def mergeData(self, dict1, dict2)->list:
         newList=dict1
         newList.extend(dict2)
