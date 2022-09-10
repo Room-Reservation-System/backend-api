@@ -197,7 +197,7 @@ class TableGenerator:
         self.sheet[f'{column}{row}'].alignment=Alignment(horizontal='center',vertical='center',wrap_text=wrap_text)
 
     def fontText(self,column:str,row:int,fontType:str):
-        locStyles:dict={'ми3п 4сцрнучы26ешкя7в5дщ9лз80жхотьагб':{'name':'Arial','size':16,'bold':False,'color':'00000000'},
+        locStyles:dict={'general':{'name':'Arial','size':16,'bold':False,'color':'00000000'},
                         'generalBold':{'name':'Arial','size':16,'bold':True,'color':'00000000'},
                         'title':{'name':'Arial','size':22,'bold':True,'color':'00000000'},
                         'event':{'name':'Arial','size':16,'bold':False,'color':'00000000'},
@@ -278,5 +278,3 @@ class TableGenerator:
                 self.colorCell(column='A', row=row)
                 self.sheet.row_dimensions[row].height=30
         self.clearNode()
-
-

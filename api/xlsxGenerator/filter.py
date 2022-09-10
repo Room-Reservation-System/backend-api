@@ -55,7 +55,6 @@ class Filter:
         for dicts in instructors:
             for items in dicts:
                 filetedInstractors[dicts['id']]=dicts['name']
-        print(classes)
         for dicts in classes:
             for key, val in dicts.items():
                 if key == 'instructor':
