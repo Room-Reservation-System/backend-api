@@ -17,7 +17,7 @@ class Room (models.Model):
 
 
 class Instructor (models.Model):
-    name =   models.CharField(max_length=150)
+    name =   models.CharField(max_length=150, )
     def __str__(self):
         return self.name
     class Meta:
@@ -73,10 +73,10 @@ class Meeting (models.Model):
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=250)
     date = models.DateField(null=True)
-    created_at = models.DateTimeField(auto_now=True)
     start_time = models.TimeField(null=True)
     end_time = models.TimeField(null=True)
     room = models.ForeignKey('Room', on_delete=models.SET_NULL, null=True)
+    repeated = models.BooleanField(default=False)
     email = models.EmailField(null=True)
 
     MEETING_STATUS = (

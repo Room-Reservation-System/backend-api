@@ -16,7 +16,6 @@ from .xlsxGenerator.tableGenerator import TableGenerator
 from .xlsxGenerator.filter import Filter
 from .QRcodeGenerator.QRcodeGenerator import QRCode
 import hashlib
-from django.conf import settings
 
 
 @api_view(['GET'])
@@ -27,17 +26,9 @@ def getQRcode(request, id):
     return Response('created')
     
 @api_view(['GET'])
-def check(request,id):
-    lectures = LectureSerializer(Lecture.objects.filter(cohort__id=id), many = True).data
-
-    filter=Filter()
-    data=filter.filterClassInstractors(classes=lectures,instructors=InstructorSerializer(Instructor.objects.all(), many = True).data)
-    return Response(data)
-
-@api_view(['GET'])
 def xlsxForRoom(request, id):
-    
-    try:    
+
+    try:
         lectures =  Lecture.objects.filter(room__id = id)
         instructors = Instructor.objects.all()
     except Lecture.DoesNotExist:
@@ -55,8 +46,8 @@ def xlsxForRoom(request, id):
 
 @api_view(['GET'])
 def xlsxForFaculty(request, id):
-    
-    try:    
+
+    try:
         lectures =  Lecture.objects.filter(instructor__id = id)
         faculty = Instructor.objects.filter(id = id)
     except Lecture.DoesNotExist or Instructor.DoesNotExist:
@@ -85,7 +76,6 @@ def xlsxForCohort(request, id):
     response=FileResponse(file)
     return response
 
-
 @api_view(['GET'])
 def xlsxForCohorts(request, id):
     idCS=id
@@ -94,22 +84,21 @@ def xlsxForCohorts(request, id):
         idCM-=1
     else:
         idCS+=1
-    try:    
+    try:
         lecturesForCS =  Lecture.objects.filter(cohort__id = idCS)
         lecturesForCM = Lecture.objects.filter(cohort__id = idCM)
         cohortCS = Cohort.objects.filter(id=idCS)
         cohortCM = Cohort.objects.filter(id=idCM)
-    
+
     except Lecture.DoesNotExist or Cohort.DoesNotExist:
         return Response(status = status.HTTP_404_NOT_FOUND)
 
     filter=Filter()
 
-        
+
     groupCS = LectureSerializer(lecturesForCS, many = True).data
     headerCS = CohortSerializer(cohortCS, many = True).data[0]
     dataCS=filter.filterRoom(roomData=groupCS,group=headerCS['major'])
-    # return Response([{'CS':idCS,'CM':idCM}])
 
     groupCM = LectureSerializer(lecturesForCM, many = True).data
     headerCM = CohortSerializer(cohortCM, many = True).data[0]
@@ -123,10 +112,8 @@ def xlsxForCohorts(request, id):
     table=TableGenerator(title=title,step=15)
     table.setDataCohortMode(data=mergedData)
     file=open(table.getFile(),'rb')
-    # return Response(mergedData)
     response=FileResponse(file)
     return response
-
 
 @api_view(['GET', 'POST'])
 def event_list(request, id):
@@ -137,20 +124,17 @@ def event_list(request, id):
         end_date = current_date + timedelta(days=90)
         start_date = current_date - timedelta(days=60)
 
-        if id == 0:
-
-            meetings = Meeting.objects.all()
-            serializer = MeetingSerializer(meetings, many = True)
-            return Response(serializer.data)
-
-        try:    
-            meetings =  Meeting.objects.filter(Q(room__id = id,status__exact = ('accepted')) & (Q(date__range=[start_date, end_date])))
+        try:
+            if id == 100 or id >=1000:
+                meetings =  Meeting.objects.filter(Q(room__id = id) & (Q(date__range=[start_date, end_date])))
+            else:
+                meetings =  Meeting.objects.filter(Q(room__id = id,status__exact = ('accepted')) & (Q(date__range=[start_date, end_date])))
         except Meeting.DoesNotExist:
             return Response(status = status.HTTP_404_NOT_FOUND)
 
         serializer = MeetingSerializer(meetings, many = True)
         return Response(serializer.data)
-    
+
     if request.method == 'POST':
         serializer = MeetingSerializer(data = request.data)
         if serializer.is_valid():
@@ -158,12 +142,12 @@ def event_list(request, id):
             room = Room.objects.get(pk = id)
 
             message = Mail(
-            from_email='ilkhom.c@outlook.com',
-            to_emails="eku.ulanov@gmail.com",
+            from_email='bookaroom.naryncampus@ucentralasia.org',
+            to_emails="shahida.atabaeva@ucentralasia.org",
             subject='A new event is creteated !',
             html_content=f'Recieved a new event request for {room}, go to https://ilkhom19.pythonanywhere.com/admin/ to "ACCEPT" or "DECLINE" the event')
             try:
-                sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+                sg = SendGridAPIClient("")
                 sg.send(message)
             except Exception as e:
                 return Response("Couldn't send email!", status=status.HTTP_408_REQUEST_TIMEOUT)
@@ -173,11 +157,7 @@ def event_list(request, id):
 
 @api_view(['GET'])
 def lecture_list(request, id):
-    if id == 0:
-        meetings = Lecture.objects.all()
-        serializer = LectureSerializer(meetings, many = True)
-        return Response(serializer.data)
-    try:    
+    try:
         meetings =  Lecture.objects.filter(room__id = id)
     except Lecture.DoesNotExist:
         return Response(status = status.HTTP_404_NOT_FOUND)
@@ -188,7 +168,7 @@ def lecture_list(request, id):
 
 @api_view(['GET'])
 def per_cohort(request, id):
-    try:    
+    try:
         lectures =  Lecture.objects.filter(cohort__id = id)
     except Lecture.DoesNotExist:
         return Response(status = status.HTTP_404_NOT_FOUND)
@@ -198,7 +178,7 @@ def per_cohort(request, id):
 
 @api_view(['GET'])
 def per_instructor(request, id):
-    try:    
+    try:
         lectures =  Lecture.objects.filter(instructor__id = id)
     except Lecture.DoesNotExist:
         return Response(status = status.HTTP_404_NOT_FOUND)
@@ -231,16 +211,17 @@ def sendMail(request):
     if targetMail.is_valid():
         address=targetMail.data['email']
         password=f'{randint(1000,9999)}'
-        salt = os.environ.get('SALT')
+        salt = "sugar"
         hashed_password = hashlib.sha512(password.encode('utf-8') + salt.encode('utf-8')).hexdigest()
         message = Mail(
             from_email='ilkhom.c@outlook.com',
             to_emails=address,
-            subject='Email Verification for RRS',
-            html_content=f'Your Secret code is: {password}')
+            subject='Email Verification !',
+            html_content=f'Your Secret code for "Book a Room" is: {password}')
         try:
-            sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+            sg = SendGridAPIClient("")
             response = sg.send(message)
+            print("email sent")
         except Exception as e:
             return Response("Couldn't send email!", status=status.HTTP_408_REQUEST_TIMEOUT)
         return Response([address,hashed_password], status=status.HTTP_200_OK)
@@ -251,7 +232,7 @@ def sendMail(request):
 # @api_view(['GET', 'PUT', 'DELETE'])
 # def meeting_detail(request, id):
 
-#     try:    
+#     try:
 #        meeting =  Meeting.objects.get(pk=id)
 #     except Meeting.DoesNotExist:
 #         return Response(status = status.HTTP_404_NOT_FOUND)

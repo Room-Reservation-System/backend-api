@@ -12,9 +12,10 @@ class InstructorAdmin(admin.ModelAdmin):
 
 class LectureAdmin(admin.ModelAdmin):
     list_display = [field.name for field in Lecture._meta.fields if field.name != "id"]
+    list_filter =  ('cohort','instructor','room')
 
 class MeetingAdmin(admin.ModelAdmin):
-    list_display = ['title','description','room','status','date','start_time','end_time','email','created_at']
+    list_display = ['title','description','room','status','date','start_time','end_time','email']
     list_filter =  ('status','room')
 
 admin.site.register(Room,RoomAdmin)
