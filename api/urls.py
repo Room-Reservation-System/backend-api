@@ -22,8 +22,5 @@ urlpatterns = [
     path('qr/<int:id>',getQRcode),
 
 
-    path('demo/<int:id>',check)
-
-
 ]
 

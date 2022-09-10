@@ -14,35 +14,18 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from .xlsxGenerator.tableGenerator import TableGenerator
 from .xlsxGenerator.filter import Filter
-from .QRcodeGenerator.QRcodeGenerator import QRcode
+from .QRcodeGenerator.QRcodeGenerator import QRCode
 import hashlib
-import qrcode
 from django.conf import settings
 
 
 @api_view(['GET'])
 def getQRcode(request, id):
-    url=os.path.join('https://www.room-schedule.vercel.app/schedule/',(str(id)+"/"))
+    qrCode=QRCode(linkData=os.path.join('www.bookaroom.app/schedule/',str(id)))
+    qrCode.generateQRCode(color='#9BC2E6')
 
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=4,
-    )
-    qr.add_data(url)
-    qr.make(fit=True)
-    img = qr.make_image()
-    filePath=os.path.join(settings.BASE_DIR,'QRCodePic','qrcode.png')
-    img.save(filePath)
-
-    # url=os.path.join('https://www.room-schedule.vercel.app/schedule/',(str(id)+"/"))
+    return Response('created')
     
-    # print(url)
-    file=open(filePath,'rb')
-    response=FileResponse(file)
-    return response
-
 @api_view(['GET'])
 def check(request,id):
     lectures = LectureSerializer(Lecture.objects.filter(cohort__id=id), many = True).data

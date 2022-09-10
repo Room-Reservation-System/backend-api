@@ -197,7 +197,7 @@ class TableGenerator:
         self.sheet[f'{column}{row}'].alignment=Alignment(horizontal='center',vertical='center',wrap_text=wrap_text)
 
     def fontText(self,column:str,row:int,fontType:str):
-        locStyles:dict={'general':{'name':'Arial','size':16,'bold':False,'color':'00000000'},
+        locStyles:dict={'ми3п 4сцрнучы26ешкя7в5дщ9лз80жхотьагб':{'name':'Arial','size':16,'bold':False,'color':'00000000'},
                         'generalBold':{'name':'Arial','size':16,'bold':True,'color':'00000000'},
                         'title':{'name':'Arial','size':22,'bold':True,'color':'00000000'},
                         'event':{'name':'Arial','size':16,'bold':False,'color':'00000000'},
@@ -220,7 +220,6 @@ class TableGenerator:
         self.fontText(column=column,row=row,fontType=fontType)
 
     def borderSet(self, column:int, startRow:int, endRow:int):
-        # print(f'{column}{startRow}:{column}{endRow}')
         locBorder=Side(border_style='medium')
         for row in self.sheet.iter_rows(min_row=startRow,min_col=column,max_row=endRow,max_col=column):
             for cell in row:
@@ -248,7 +247,6 @@ class TableGenerator:
         self.colorCell(column='B',row=1,color='E0E0E0')
         self.colorCell(column='A',row=1,color='E0E0E0')
         self.writeText(column='B', row=1, text=self.title,fontType='title')
-
 
     def setTimeColumn(self):
         for cell in (6,67):
