@@ -8,15 +8,16 @@ from django.conf import settings
 class QRCode:
 	
 	def __init__(self,linkData:str,fileName:str='qrcode',logoPath:str=os.path.join(settings.BASE_DIR,'QRCodePic','logoUCA2.jpg'),
-				 basePicSize=PicSize(width=420,height=500),backgroundPicSize=PicSize(width=370,height=450),qrCodeSize=PicSize(width=320,height=320)):
+				 basePicSize=PicSize(width=2100,height=2500),backgroundPicSize=PicSize(width=1850,height=2250),qrCodeSize=PicSize(width=1600,height=1600)):
 
-		self.linkData = linkData
+		self.linkData=linkData
 		self.dirName=os.path.join(settings.BASE_DIR,'QRCodePic')
 		self.fileName=f'{fileName}.png'
 		self.logoPath=logoPath
 		self.basePicSize=basePicSize
 		self.backgroundPicSize=backgroundPicSize
 		self.qrCodeSize=qrCodeSize
+		self.settingsQRCode()
 
 
 	def settingsQRCode(self):
@@ -44,7 +45,7 @@ class QRCode:
 		imageLocation=(self.basePicSize.width//2-self.qrCodeSize.width//2,  (self.basePicSize.width//2-self.qrCodeSize.height//2))
 		baseImage.paste(localImage,imageLocation)
 		
-		self.__drawText(image=baseImage,text='www.bookaroom.app',textType='link',textLocation=(200,400))
+		self.__drawText(image=baseImage,text='www.bookaroom.app',textType='link',textLocation=(1000,2000))
 		# self.__drawText(image=baseImage,text='SCAN ME',textType='title',textLocation=(200,400))
 		# self.__drawText(image=baseImage,text='TO VIEW ONLINE SCHEDULE',textType='description',textLocation=(200,440))
 		baseImage.save(os.path.join(self.dirName,self.fileName))
@@ -64,7 +65,7 @@ class QRCode:
 	def __drawText(self,image,text:str,color:str='#000000',font=None,textType:str=None,textLocation:Tuple[int,int]=None):
 
 		fonts:dict={'GasaltRegular':'fonts\GasaltRegular.ttf','InsightSansSSi':'fonts\InsightSansSSi.ttf','public-sans.light':'fonts\public-sans.light.ttf'}
-		textTypes:dict={'general':{'size':16,'index':0},'link':{'size':25,'index':0},
+		textTypes:dict={'general':{'size':16,'index':0},'link':{'size':125,'index':0},
 						'title':{'size':45,'index':0},'description':{'size':30,'index':0}}
 		textLocations:dict={'general':{'x':16,'y':0},'link':{'x':12,'y':0}, 'title':{'x':20,'y':0},'description':{'x':14,'y':0}}
 		

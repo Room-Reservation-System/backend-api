@@ -9,6 +9,7 @@ class Room (models.Model):
     seats = models.IntegerField(default = 0,validators=[MaxValueValidator(250), MinValueValidator(1)])
     academic = models.BooleanField(default=False)
     information = models.CharField(max_length=250)
+    color = models.CharField(max_length=7,default="FFFFFF")
 
     def __str__(self):
         return self.name
