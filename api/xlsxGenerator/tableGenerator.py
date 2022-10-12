@@ -26,7 +26,8 @@ class TableGenerator:
         self.week_list=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
         self.base=Base(self.fileName)
         self.sheet=self.base.getWorkSheet()
-        self.roomColor:dict={'201':'FF0000',
+        self.roomColor:dict={
+                        '201':'FF0000',
                         '202':'FFFFFF',
                         '203':'D0CECE',
                         '204':'92D050',

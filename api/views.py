@@ -20,9 +20,38 @@ import hashlib
 
 @api_view(['GET'])
 def getQRcode(request, id):
-    qrCode=QRCode(linkData=os.path.join('www.bookaroom.app/schedule/',str(id)))
-    qrCode.generateQRCode(color='#9BC2E6')
-
+    link='https://bookaroom.app/schedule/'
+    qrCodes={'14':link+'14',
+             '101':link+'101',
+             '109':link+'109',
+             '111':link+'111',
+             '201':link+'201',
+             '202':link+'202',
+             '203':link+'203',
+             '204':link+'204',
+             '206':link+'206',
+             '209':link+'209',
+             '328':link+'328'
+             }
+    roomColor:dict={'14':'#8EA9DB',
+                    '101':'#00FFFF',
+                    '109':'#DDEBF7',
+                    '111':'#F4B084',
+                    '201':'#FF0000',
+                    '202':'#FFFFFF',
+                    '203':'#D0CECE',
+                    '204':'#2AF359',
+                    '206':'#CC99FF',
+                    '209':'#FFFF00',
+                    '328':'#D6DCE4',
+                    }
+    # for key, val in qrCodes.items():
+    #     if key in roomColor:
+    #         qrCode=QRCode(linkData=val,fileName=key)
+    #         qrCode.generateQRCode(color=roomColor[key])
+    for item in ['205','326']:
+        qrCode=QRCode(linkData=f'{link}{item}',fileName=item)
+        qrCode.generateQRCode(color='#BEEEFF')
     return Response('created')
     
 @api_view(['GET'])
