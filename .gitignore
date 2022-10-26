@@ -180,4 +180,6 @@ sendgrid.env
 **.jpg
 # **.jpg
 .vscode/
+.idea
+
 =======
