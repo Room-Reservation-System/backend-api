@@ -39,7 +39,8 @@ class TableGenerator:
                         '3.28':'D6DCE4',
                         'B14':'8EA9DB',
                         '11':'00FFFF',
-                        '69':'FFFFFF'}
+                        '69':'FFFFFF',
+                        '20202':'000000'}
         self.setTimeColumn()
 
     def setDataCohortMode(self,data,group:Group=Group(groupOne='Cohort One: Arts',groupTwo='Cohort Two: Sciences')):
