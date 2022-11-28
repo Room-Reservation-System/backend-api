@@ -20,10 +20,5 @@ urlpatterns = [
     path('downloadroom/<int:id>', xlsxForRoom),
     path('downloadfaculty/<int:id>', xlsxForFaculty),
     path('qr/<int:id>',getQRcode),
-
-
-    path('demo/<int:id>',check)
-
-
 ]
 
