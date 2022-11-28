@@ -211,7 +211,7 @@ def sendMail(request):
     if targetMail.is_valid():
         address=targetMail.data['email']
         password=f'{randint(1000,9999)}'
-        salt = "sugar"
+        salt = ""
         hashed_password = hashlib.sha512(password.encode('utf-8') + salt.encode('utf-8')).hexdigest()
         message = Mail(
             from_email='ilkhom.c@outlook.com',
