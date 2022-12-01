@@ -226,28 +226,3 @@ def sendMail(request):
             return Response("Couldn't send email!", status=status.HTTP_408_REQUEST_TIMEOUT)
         return Response([address,hashed_password], status=status.HTTP_200_OK)
     else: return Response(targetMail.errors)
-
-
-
-# @api_view(['GET', 'PUT', 'DELETE'])
-# def meeting_detail(request, id):
-
-#     try:
-#        meeting =  Meeting.objects.get(pk=id)
-#     except Meeting.DoesNotExist:
-#         return Response(status = status.HTTP_404_NOT_FOUND)
-
-#     if request.method == 'GET':
-#         serializer = MeetingSerializer(meeting)
-#         return Response(serializer.data)
-
-#     elif request.method == 'PUT':
-#         serializer = MeetingSerializer(meeting, data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data)
-#         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
-
-#     elif request.method == 'DELETE':
-#         meeting.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
