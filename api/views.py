@@ -16,6 +16,12 @@ from .xlsxGenerator.tableGenerator import TableGenerator
 from .xlsxGenerator.filter import Filter
 from .QRcodeGenerator.QRcodeGenerator import QRcode
 import hashlib
+import requests
+
+PIGEON_API = "http://18.182.3.112/mailto/"
+
+
+
 
 
 @api_view(['GET'])
@@ -139,18 +145,14 @@ def event_list(request, id):
         serializer = MeetingSerializer(data = request.data)
         if serializer.is_valid():
             serializer.save()
-            room = Room.objects.get(pk = id)
+            if id != 100 and id < 1000:
+                room = Room.objects.get(pk = id)
 
-            message = Mail(
-            from_email='bookaroom.naryncampus@ucentralasia.org',
-            to_emails="shahida.atabaeva@ucentralasia.org",
-            subject='A new event is creteated !',
-            html_content=f'Recieved a new event request for {room}, go to https://ilkhom19.pythonanywhere.com/admin/ to "ACCEPT" or "DECLINE" the event')
-            try:
-                sg = SendGridAPIClient("")
-                sg.send(message)
-            except Exception as e:
-                return Response("Couldn't send email!", status=status.HTTP_408_REQUEST_TIMEOUT)
+                data = {'subject' : 'A new event is creteated !', 'body' : 'A new event request, please go to Admin Panel: https://ilkhom19.pythonanywhere.com/admin/api/meeting/?status__exact=pending','address' : 'shahida.atabaeva@ucentralasia.org' }
+                response = requests.post(PIGEON_API,data)
+                if response.status_code != 200:
+                    return Response("Couldn't send email!", status=status.HTTP_408_REQUEST_TIMEOUT)
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
@@ -211,18 +213,12 @@ def sendMail(request):
     if targetMail.is_valid():
         address=targetMail.data['email']
         password=f'{randint(1000,9999)}'
-        salt = ""
+        salt = "secret!"
         hashed_password = hashlib.sha512(password.encode('utf-8') + salt.encode('utf-8')).hexdigest()
-        message = Mail(
-            from_email='ilkhom.c@outlook.com',
-            to_emails=address,
-            subject='Email Verification !',
-            html_content=f'Your Secret code for "Book a Room" is: {password}')
-        try:
-            sg = SendGridAPIClient("")
-            response = sg.send(message)
-            print("email sent")
-        except Exception as e:
+
+        data = {'subject' : 'Book a Room Email Verification', 'body' : f'Your Secret code is: {password}','address' : address }
+        response = requests.post(PIGEON_API,data)
+        if response.status_code != 200:
             return Response("Couldn't send email!", status=status.HTTP_408_REQUEST_TIMEOUT)
         return Response([address,hashed_password], status=status.HTTP_200_OK)
     else: return Response(targetMail.errors)
