@@ -148,7 +148,9 @@ def event_list(request, id):
             if id != 100 and id < 1000:
                 room = Room.objects.get(pk = id)
 
-                data = {'subject' : 'A new event is creteated !', 'body' : 'A new event request, please go to Admin Panel: https://ilkhom19.pythonanywhere.com/admin/api/meeting/?status__exact=pending','address' : 'shahida.atabaeva@ucentralasia.org' }
+                data = {'subject' : 'A new event is creteated !', 
+                        'body' : 'A new event request, please go to Admin Panel: https://ilkhom19.pythonanywhere.com/admin/api/meeting/?status__exact=pending',
+                        'address' : 'shahida.atabaeva@ucentralasia.org' }
                 response = requests.post(PIGEON_API,data)
                 if response.status_code != 200:
                     return Response("Couldn't send email!", status=status.HTTP_408_REQUEST_TIMEOUT)
@@ -216,7 +218,9 @@ def sendMail(request):
         salt = "secret!"
         hashed_password = hashlib.sha512(password.encode('utf-8') + salt.encode('utf-8')).hexdigest()
 
-        data = {'subject' : 'Book a Room Email Verification', 'body' : f'Your Secret code is: {password}','address' : address }
+        data = {'subject' : 'Book a Room Email Verification', 
+                'body' : f'Your Secret code is: {password}',
+                'address' : address }
         response = requests.post(PIGEON_API,data)
         if response.status_code != 200:
             return Response("Couldn't send email!", status=status.HTTP_408_REQUEST_TIMEOUT)
